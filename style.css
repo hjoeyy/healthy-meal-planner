@@ -1,0 +1,27 @@
+.navbar {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    background-color: #65ab65;
+}
+
+.menu-options {
+    display: flex;
+    list-style: none;
+    gap: 8px;
+}
+
+.page-header h1 {
+    font-size: 36px;
+    text-align: center;
+}
+.main-container {
+    display: flex;
+    flex-direction: column;
+    gap: 100px;
+
+}
+.search-bar {
+    padding-top: 50px;
+    text-align: center;
+}
