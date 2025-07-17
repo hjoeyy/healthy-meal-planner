@@ -1,27 +1,126 @@
 .navbar {
     display: flex;
-    justify-content: space-around;
+    justify-content: space-between;
     align-items: center;
     background-color: #65ab65;
+    padding: 20px 0;
 }
 
-.menu-options {
+.nav-list {
     display: flex;
     list-style: none;
-    gap: 8px;
+    gap: 16px;
+    padding-right: 16px;
+    color: white;
+}
+
+.nav-link {
+    text-decoration: none;
+    color: white;
 }
 
 .page-header h1 {
     font-size: 36px;
     text-align: center;
+    padding-left: 16px;
+    color: white;
 }
 .main-container {
     display: flex;
     flex-direction: column;
     gap: 100px;
-
 }
 .search-bar {
     padding-top: 50px;
     text-align: center;
+}
+
+.search-bar input {
+    width: 50%;
+    height: 50px;
+    border: 1px solid lightgray;
+    border-radius: 10px;
+    font-size: 18px;
+}
+
+.recipes {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.recipe-cards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    align-items: start;
+}
+
+.recipe-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border: 1px solid lightgray;
+    border-radius: 20px;
+    padding: 20px;
+    position: relative;
+}
+
+.favorite {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 1;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+}
+
+.title-wrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 16px;
+}
+
+.title-wrapper h3 {
+    font-size: 28px;
+}
+
+.add-plan-button {
+    font-size: 24px;
+    padding: 10px 20px;
+    border-radius: 10px;
+    color: white;
+    cursor: pointer;
+    background-color: #65ab65;
+    border: none;
+}
+.meal-calendar {
+    display: flex;
+    flex-direction: column;
+    align-items: end;
+    padding-right: 100px;
+    gap: 0px;
+}
+.meal-calendar-button {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    padding: 50px;
+    border: none;
+    background-color: #65ab65;
+}
+
+.meal-calendar-button img {
+    align-self: center;
 }

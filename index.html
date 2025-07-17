@@ -3,9 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Healthy Meal Planner</title>
+    <link rel="icon" type="image/x-icon" href="assets/salad-svgrepo-com.svg">
     <link rel="stylesheet" href="style.css" />
     <link rel="stylesheet" href="global.css" />
+    <link href="https://fonts.googleapis.com/css?family=Inter:400,600&display=swap" rel="stylesheet">
 </head>
 <body>
     <header>
@@ -13,9 +15,9 @@
             <div class="page-header">
                 <h1>🥗 Healthy Meal Planner</h1>
             </div>
-            <ul class="menu-options">
-                <li>Home</li>
-                <li>Meal Plan</li>
+            <ul class="nav-list">
+                <li><a href="index.html" class="nav-link">Home</a></li>
+                <li><a href="meal-plan.html" class="nav-link">Meal Plan</a></li>
                 <li>Shopping List</li>
                 <li>Favorites</li>
             </ul>
@@ -26,10 +28,63 @@
             <section class="search-bar">
                 <form action="#">
                     <input type="text" placeholder="Search recipes...">
-                    <button type="submit"></button>
                 </form>
             </section>
-            <section class="recipes"></section>
+            <section class="recipes">
+                <div class="recipe-cards">
+                    <div class="recipe-card">
+                        <button class="favorite"><img src="assets/heart-svgrepo-com.svg" alt="favorite-heart-icon" width="30px" height="30px" /></button>
+                        <img src="assets/avocado-salad.png" width="200px" height="200px" />
+                        <div class="title-wrapper">
+                            <h3>Avocado Salad</h3>
+                            <button class="add-plan-button">Add to Plan</button>
+                        </div>
+                    </div>
+                    <div class="recipe-card">
+                        <button class="favorite"><img src="assets/heart-svgrepo-com.svg" alt="favorite-heart-icon" width="30px" height="30px" /></button>
+                        <img src="assets/grilled-chicken.png" width="200px" height="200px" />
+                        <div class="title-wrapper">
+                            <h3>Grilled Chicken</h3>
+                            <button class="add-plan-button">Add to Plan</button>
+                        </div>
+                    </div>
+                    <div class="recipe-card">
+                        <button class="favorite"><img src="assets/heart-svgrepo-com.svg" alt="favorite-heart-icon" width="30px" height="30px" /></button>
+                        <img src="assets/veggie-stir-fry.png" width="200px" height="200px" />
+                        <div class="title-wrapper">
+                            <h3>Veggie Stir Fry</h3>
+                            <button class="add-plan-button">Add to Plan</button>
+                        </div>
+                    </div>
+                    <div class="recipe-card">
+                        <button class="favorite"><img src="assets/heart-svgrepo-com.svg" alt="favorite-heart-icon" width="30px" height="30px" /></button>
+                        <img src="assets/pasta-primavera.png" width="200px" height="200px" />
+                        <div class="title-wrapper">
+                            <h3>Pasta Primavera</h3>
+                            <button class="add-plan-button">Add to Plan</button>
+                        </div>
+                    </div>
+                    <div class="recipe-card">
+                        <button class="favorite"><img src="assets/heart-svgrepo-com.svg" alt="favorite-heart-icon" width="30px" height="30px" /></button>
+                        <img src="assets/omelette.png" width="200px" height="200px" />
+                        <div class="title-wrapper">
+                            <h3>Omelette</h3>
+                            <button class="add-plan-button">Add to Plan</button>
+                        </div>
+                    </div>
+                    <div class="recipe-card">
+                        <button class="favorite"><img src="assets/heart-svgrepo-com.svg" alt="favorite-heart-icon" width="30px" height="30px" /></button>
+                        <img src="assets/quinoa-bowl.png" width="200px" height="200px" />
+                        <div class="title-wrapper">
+                            <h3>Quinoa Bowl</h3>
+                            <button class="add-plan-button">Add to Plan</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <section class="meal-calendar">
+                <button class="meal-calendar-button"><a><img src="assets/calendar-lines-svgrepo-com.svg" width="50px" height="50px" /></a></button>
+            </section>
         </div>
     </main>
 </body>
