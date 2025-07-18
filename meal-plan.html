@@ -18,16 +18,90 @@
             <ul class="nav-list">
                 <li><a href="index.html" class="nav-link">Home</a></li>
                 <li><a href="meal-plan.html" class="nav-link">Meal Plan</a></li>
-                <li>Shopping List</li>
-                <li>Favorites</li>
+                <li><a href="shopping-list.html" class="nav-link">Shopping List</a></li>
+                <li><a href="favorites.html" class="nav-link">Favorites</a></li>
             </ul>
         </nav>
     </header>
     <main>
         <div class="main-container">
             <section class="meal-plan">
+                <div class="meal-plan-calendar-header">
+                    <h1>Weekly Meal Plan</h1>
+                </div>
                 <div class="meal-plan-calendar">
-                    <h1>Meal Plan</h1>
+                    <table class="calendar">
+                        <thead>
+                            <tr>
+                                <th>Monday</th>
+                                <th>Tuesday</th>
+                                <th>Wednesday</th>
+                                <th>Thursday</th>
+                                <th>Friday</th>
+                                <th>Saturday</th>
+                                <th>Sunday</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <div class="meal">
+                                        <img src="assets/grilled-chicken.png" alt="grilled-chicken" width="100px" height="100px" /><br>Grilled Chicken<br><button>+ Add Meal</button>
+                                    </div>
+                                </td>
+                                <td><div class="meal"><button>+ Add Meal</button></div></td>
+                                <td><div class="meal"><button>+ Add Meal</button></div></td>
+                                <td><div class="meal"><button>+ Add Meal</button></div></td>
+                                <td><div class="meal"><button>+ Add Meal</button></div></td>
+                                <td><div class="meal"><button>+ Add Meal</button></div></td>
+                                <td><div class="meal"><button>+ Add Meal</button></div></td>
+                            </tr>
+                            <tr>
+                                <td><div class="meal"><button>+ Add Meal</button></div></td>
+                                <td><div class="meal"><button>+ Add Meal</button></div></td>
+                                <td><div class="meal"><button>+ Add Meal</button></div></td>
+                                <td><div class="meal"><img src="assets/avocado-salad.png" alt="avocado-salad" width="100px" height="100px" /><br>Avocado Salad<br><button>+ Add Meal</button></div></td>
+                                <td><div class="meal"><button>+ Add Meal</button></div></td>
+                                <td><div class="meal"><button>+ Add Meal</button></div></td>
+                                <td><div class="meal"><button>+ Add Meal</button></div></td>
+                            </tr>
+                            <tr>
+                                <td><div class="meal"><button>+ Add Meal</button></div></td>
+                                <td><div class="meal"><img src="assets/veggie-stir-fry.png" alt="veggie-stir-fry" width="100px" height="100px" /><br>Veggie Stir Fry<br><button>+ Add Meal</button></div></td>
+                                <td><div class="meal"><button>+ Add Meal</button></div></td>
+                                <td><div class="meal"><button>+ Add Meal</button></div></td>
+                                <td><div class="meal"><button>+ Add Meal</button></div></td>
+                                <td><div class="meal"><button>+ Add Meal</button></div></td>
+                                <td><div class="meal"><button>+ Add Meal</button></div></td>
+                            </tr>
+                            <tr>
+                                <td><div class="meal"><button>+ Add Meal</button></div></td>
+                                <td><div class="meal"><button>+ Add Meal</button></div></td>
+                                <td><div class="meal"><button>+ Add Meal</button></div></td>
+                                <td><div class="meal"><button>+ Add Meal</button></div></td>
+                                <td><div class="meal"><img src="assets/pasta-primavera.png" alt="pasta-primavera" width="100px" height="100px" /><br>Pasta Primavera<button>+ Add Meal</button></div></td>
+                                <td><div class="meal"><button>+ Add Meal</button></div></td>
+                                <td><div class="meal"><button>+ Add Meal</button></div></td>
+                            </tr>
+                            <tr>
+                                <td><div class="meal"><button>+ Add Meal</button></div></td>
+                                <td><div class="meal"><button>+ Add Meal</button></div></td>
+                                <td><div class="meal"><button>+ Add Meal</button></div></td>
+                                <td><div class="meal"><button>+ Add Meal</button></div></td>
+                                <td><div class="meal"><button>+ Add Meal</button></div></td>
+                                <td><div class="meal"><button>+ Add Meal</button></div></td>
+                                <td>
+                                    <div class="meal">
+                                        <img src="assets/omelette.png" alt="omelette" width="100px" height="100px" />Omelette<br><button>+ Add Meal</button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="calendar-buttons">
+                    <button class="clear-all">Clear All</button>
+                    <button class="generate-shopping-list">Generate Shopping List</button>
                 </div>
             </section>
         </div>

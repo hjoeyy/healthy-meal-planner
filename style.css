@@ -11,12 +11,13 @@
     list-style: none;
     gap: 16px;
     padding-right: 16px;
-    color: white;
+    background-color: #65ab65;
 }
 
 .nav-link {
     text-decoration: none;
     color: white;
+    background-color: #65ab65;
 }
 
 .page-header h1 {
@@ -24,12 +25,22 @@
     text-align: center;
     padding-left: 16px;
     color: white;
+    background-color: #65ab65;
 }
 .main-container {
     display: flex;
     flex-direction: column;
     gap: 100px;
 }
+
+.recipes-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 50px;
+    font-size: 48px;
+}
+
 .search-bar {
     padding-top: 50px;
     text-align: center;
@@ -101,6 +112,7 @@
     background-color: #65ab65;
     border: none;
 }
+
 .meal-calendar {
     display: flex;
     flex-direction: column;
@@ -123,4 +135,171 @@
 
 .meal-calendar-button img {
     align-self: center;
+    background: transparent;
+    background-color: #65ab65;
 }
+
+.meal-calendar-button a {
+    text-decoration: none;
+    background-color: #65ab65;
+}
+
+
+/* Meal Plan Calendar */
+
+.meal-plan {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 50px;
+}
+
+.meal-plan-calendar-header {
+    font-size: 48px;
+    padding-bottom: 50px;
+}
+
+.calendar {
+    border-spacing: 10px;
+}
+
+.calendar th {
+    font-size: 24px;
+    padding-bottom: 20px;
+}
+
+.calendar td {
+    border: 1px solid lightgray;
+    background-color: white;
+}
+
+.meal {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    background-color: white;
+    padding: 10px 30px;
+}
+
+.meal button {
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    background-color: white;
+}
+
+.meal img {
+    background-color: white;
+}
+
+.calendar-buttons {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    justify-content: flex-end;
+    width: 100%;
+    padding-right: 50px;
+    padding-top: 20px;
+}
+
+.clear-all {
+    border-radius: 5px;
+    background-color: white;
+    padding: 5px 10px;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+.generate-shopping-list {
+    border-radius: 5px;
+    font-size: 24px;
+    background-color: #65ab65;
+    color: white;
+    padding: 5px 10px;
+    cursor: pointer;
+}
+
+/* Shopping List */
+
+.shopping-list {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 50px;
+}
+
+.shopping-list-header {
+    font-size: 48px;
+    padding-bottom: 50px;
+}
+
+.shopping-wrapper {
+    border: 1px solid lightgray;
+    width: 50%;
+
+}
+.shopping-list ul {
+    list-style: none;
+    font-size: 50px;
+}
+
+.shopping-list .item {
+    display: flex;
+    gap: 16px;
+}
+
+.shopping-list .item input {
+    width: 50px;
+    height: 50px;
+}
+
+.shopping-list-actions {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    align-items: center;
+    padding: 20px 0;
+}
+
+.clear-list, .export-print {
+    border-radius: 5px;
+    font-size: 32px;
+    background-color: #65ab65;
+    color: white;
+    padding: 10px 20px;
+    cursor: pointer;
+    border: none;
+}
+
+/* Favorites */
+
+.favorites {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 50px;
+}
+
+.favorites-header {
+    font-size: 48px;
+    padding-bottom: 50px;
+}
+
+.favorite-recipe-cards {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    align-items: start;
+}
+
+.favorite-recipe-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border: 1px solid lightgray;
+    border-radius: 20px;
+    padding: 20px;
+    position: relative;
+}
+
