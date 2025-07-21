@@ -46,12 +46,23 @@
     text-align: center;
 }
 
+.search-bar form {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
 .search-bar input {
     width: 50%;
     height: 50px;
     border: 1px solid lightgray;
     border-radius: 10px;
     font-size: 18px;
+}
+
+.search-bar .submit-btn {
+    width: 10%;
+    cursor: pointer;
 }
 
 .recipes {
