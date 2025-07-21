@@ -5,6 +5,9 @@ const search_btn = document.getElementById('submit-btn');
 const errorMessage = document.getElementById('errorMessage');
 const recipeCards = document.querySelector('.recipe-cards');
 const addPlanButton = document.querySelector('.add-plan-button');
+const closeButton = document.querySelector('.close-button');
+const modal = document.getElementById('modal');
+
 
 
 async function getRecipeData(input) {
@@ -80,5 +83,10 @@ let mealPlan = {
     sunday: [null, null, null, null, null]
 }
 
+function popUpForm() {
 
+}
+
+
+addPlanButton.addEventListener('click', popUpForm);
 
