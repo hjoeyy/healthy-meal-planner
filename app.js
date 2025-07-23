@@ -81,4 +81,9 @@ let mealPlan = {
 }
 
 
+function mealLocation() {
+    
+}
+
+addPlanButton.addEventListener('click', mealLocation);
 
