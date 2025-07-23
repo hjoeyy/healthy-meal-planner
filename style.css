@@ -215,6 +215,10 @@
     color: #ffffff;
     cursor: pointer;
 }
+
+.modal-container.show-modal {
+    display: block;
+}
 /* Meal Plan Calendar */
 
 .meal-plan {

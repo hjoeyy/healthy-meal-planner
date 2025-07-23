@@ -4,7 +4,7 @@ const search = document.getElementById('search');
 const search_btn = document.getElementById('submit-btn');
 const errorMessage = document.getElementById('errorMessage');
 const recipeCards = document.querySelector('.recipe-cards');
-const addPlanButton = document.querySelector('.add-plan-button');
+const addPlanButton = document.querySelectorAll('.add-plan-button');
 const closeButton = document.querySelector('.close-button');
 const modal = document.getElementById('modal');
 
@@ -87,11 +87,5 @@ function popUpForm() {
 
 }
 
-function mealLocation() {
-    
-}
-
-addPlanButton.addEventListener('click', mealLocation);
-
-addPlanButton.addEventListener('click', popUpForm);
+addPlanButton.addEventListener('click', modal.classList.add('show-modal'));
 
