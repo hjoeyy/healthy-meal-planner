@@ -7,7 +7,9 @@ const recipeCards = document.querySelector('.recipe-cards');
 const addPlanButton = document.querySelectorAll('.add-plan-button');
 const closeButton = document.querySelector('.close-button');
 const modal = document.getElementById('modal');
-
+const modalBox = document.querySelector('.modal');
+const modalForm = document.querySelector('.modal-form');
+makeModalDraggable(modalBox);
 
 
 async function getRecipeData(input) {
@@ -83,9 +85,62 @@ let mealPlan = {
     sunday: [null, null, null, null, null]
 }
 
-function popUpForm() {
+// This function makes the modal draggable by clicking and dragging it
+function makeModalDraggable(modal) {
+    let offsetX = 0, offsetY = 0, startX = 0, startY = 0, isDragging = false;
 
+    // When mouse is pressed down on the modal, start dragging
+    modal.addEventListener('mousedown', function(e) {
+        isDragging = true;
+        startX = e.clientX; // Mouse X position when drag starts
+        startY = e.clientY; // Mouse Y position when drag starts
+        // Get modal's current position
+        const rect = modal.getBoundingClientRect();
+        offsetX = startX - rect.left;
+        offsetY = startY - rect.top;
+        document.body.style.userSelect = 'none'; // Prevents text selection while dragging
+    });
+
+    // When mouse moves, if dragging, move the modal to follow the mouse
+    document.addEventListener('mousemove', function(e) {
+        if (!isDragging) return; // Only move if dragging
+        // Calculate new position for the modal
+        let left = e.clientX - offsetX;
+        let top = e.clientY - offsetY;
+        // Move modal to new position
+        modal.style.left = left + 'px';
+        modal.style.top = top + 'px';
+        modal.style.transform = 'none'; // Disable centering while dragging
+        modal.style.position = 'fixed'; // Keep modal on top
+    });
+
+    // When mouse is released, stop dragging
+    document.addEventListener('mouseup', function() {
+        isDragging = false;
+        document.body.style.userSelect = '';
+    });
 }
 
-addPlanButton.addEventListener('click', modal.classList.add('show-modal'));
+// Listen for clicks on any "Add to Plan" button inside recipe cards
+recipeCards.addEventListener('click', function(e) {
+    if (e.target.classList.contains('add-plan-button')) {
+        modal.classList.add('show-modal'); // Show the modal
+        e.target.classList.add('clicked'); // indicate the specific recipe clicked
+    }
+});
+
+// Listen for clicks on the close button to hide the modal
+closeButton.addEventListener('click', () => {
+    modal.classList.remove('show-modal'); // Hide the modal
+});
+
+// Listen for clicks on the window; if the click is on the modal background, hide the modal
+window.addEventListener('click', e => {
+    e.target === modal ? modal.classList.remove('show-modal') : false;
+})
+
+function updateMealPlan(day, meal_number, meal_plan = {}) {
+    
+}
+modalForm.addEventListener('submit', updateMealPlan);
 

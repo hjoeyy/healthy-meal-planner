@@ -115,16 +115,6 @@
     font-size: 28px;
 }
 
-.add-plan-button {
-    font-size: 24px;
-    padding: 10px 20px;
-    border-radius: 10px;
-    color: white;
-    cursor: pointer;
-    background-color: #65ab65;
-    border: none;
-}
-
 .meal-calendar {
     display: flex;
     flex-direction: column;
@@ -157,38 +147,53 @@
 }
 
 .modal-container {
+    display: none;
     background-color: transparent;
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
+    z-index: 1000;
 }
 
 .modal {
-    background: #f7f7f7;
-    display: none;
+    background: #98ecb4;
+    display: block;
     border-radius: 5px;
     position: absolute;
+    cursor: move;
     overflow: hidden;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
     max-width: 100%;
     width: 400px;
+    z-index: 1100;
 }
 
 .modal-content {
     padding: 20px;
+    background: transparent;
+}
+
+.modal-content h1 {
+    background: transparent;
+}
+
+.modal-form {
+    background: transparent;
 }
 
 .modal-form div {
     margin: 20px 0;
+    background: transparent;
 }
 
 .modal-form label {
     display: block;
     margin-bottom: 6px;
+    background: transparent;
 }
 
 .modal-form .form-input {
@@ -204,7 +209,6 @@
     top: 5px;
     right: 0;
     cursor: pointer;
-
 }
 
 .modal-container .submit-button {
@@ -218,6 +222,16 @@
 
 .modal-container.show-modal {
     display: block;
+}
+
+.add-plan-button {
+    font-size: 24px;
+    padding: 10px 20px;
+    border-radius: 10px;
+    color: white;
+    cursor: pointer;
+    background-color: #65ab65;
+    border: none;
 }
 /* Meal Plan Calendar */
 
