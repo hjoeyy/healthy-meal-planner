@@ -88,6 +88,7 @@
     position: relative;
 }
 
+
 .favorite {
     display: flex;
     align-items: center;
@@ -155,7 +156,65 @@
     background-color: #65ab65;
 }
 
+.modal-container {
+    background-color: transparent;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}
 
+.modal {
+    background: #f7f7f7;
+    display: none;
+    border-radius: 5px;
+    position: absolute;
+    overflow: hidden;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    max-width: 100%;
+    width: 400px;
+}
+
+.modal-content {
+    padding: 20px;
+}
+
+.modal-form div {
+    margin: 20px 0;
+}
+
+.modal-form label {
+    display: block;
+    margin-bottom: 6px;
+}
+
+.modal-form .form-input {
+    padding: 8px;
+    width: 100%;
+}
+
+.close-button {
+    background: transparent;
+    border: none;
+    font-size: 25px;
+    position: absolute;
+    top: 5px;
+    right: 0;
+    cursor: pointer;
+
+}
+
+.modal-container .submit-button {
+    padding: 10px 30px;
+    font-weight: bold;
+    background: #65ab65;
+    border: none;
+    color: #ffffff;
+    cursor: pointer;
+}
 /* Meal Plan Calendar */
 
 .meal-plan {
