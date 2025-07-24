@@ -42,7 +42,7 @@
                         <img src="assets/avocado-salad.png" width="200px" height="200px" />
                         <div class="title-wrapper">
                             <h3>Avocado Salad</h3>
-                            <button class="add-plan-button">Add to Plan</button>
+                            <button class="add-plan-button" data-recipe='{"id":123,"title":"Avocado Salad","image":"assets/avocado-salad.png"}'>Add to Plan</button>
                         </div>
                     </div>
                     <div class="recipe-card">
@@ -50,7 +50,7 @@
                         <img src="assets/grilled-chicken.png" width="200px" height="200px" />
                         <div class="title-wrapper">
                             <h3>Grilled Chicken</h3>
-                            <button class="add-plan-button">Add to Plan</button>
+                            <button class="add-plan-button" data-recipe='{"id":124,"title":"Grilled Chicken","image":"assets/grilled-chicken.png"}'>Add to Plan</button>
                         </div>
                     </div>
                     <div class="recipe-card">
@@ -58,7 +58,7 @@
                         <img src="assets/veggie-stir-fry.png" width="200px" height="200px" />
                         <div class="title-wrapper">
                             <h3>Veggie Stir Fry</h3>
-                            <button class="add-plan-button">Add to Plan</button>
+                            <button class="add-plan-button" data-recipe='{"id":125,"title":"Veggie Stir Fry","image":"assets/veggie-stir-fry.png"}'>Add to Plan</button>
                         </div>
                     </div>
                     <div class="recipe-card">
@@ -66,7 +66,7 @@
                         <img src="assets/pasta-primavera.png" width="200px" height="200px" />
                         <div class="title-wrapper">
                             <h3>Pasta Primavera</h3>
-                            <button class="add-plan-button">Add to Plan</button>
+                            <button class="add-plan-button" data-recipe='{"id":126,"title":"Pasta Primavera","image":"assets/pasta-primavera.png"}'>Add to Plan</button>
                         </div>
                     </div>
                     <div class="recipe-card">
@@ -74,7 +74,7 @@
                         <img src="assets/omelette.png" width="200px" height="200px" />
                         <div class="title-wrapper">
                             <h3>Omelette</h3>
-                            <button class="add-plan-button">Add to Plan</button>
+                            <button class="add-plan-button" data-recipe='{"id":127,"title":"Omelette","image":"assets/omelette.png"}'>Add to Plan</button>
                         </div>
                     </div>
                     <div class="recipe-card">
@@ -82,7 +82,7 @@
                         <img src="assets/quinoa-bowl.png" width="200px" height="200px" />
                         <div class="title-wrapper">
                             <h3>Quinoa Bowl</h3>
-                            <button class="add-plan-button">Add to Plan</button>
+                            <button class="add-plan-button" data-recipe='{"id":128,"title":"Quinoa Bowl","image":"assets/quinoa-bowl.png"}'>Add to Plan</button>
                         </div>
                     </div>
                 </div>
@@ -94,11 +94,11 @@
                             <form class="modal-form">
                                 <div>
                                     <label for="day">Day</label>
-                                    <input type="text" id="day" placeholder="Enter day" class="day-input" />
+                                    <input type="text" id="day" name="day" placeholder="Enter day" class="day-input" />
                                 </div>
                                 <div>
                                     <label for="meal-number">Meal #</label>
-                                    <input type="number" id="meal-num" placeholder="Enter meal number" class="day-input" />
+                                    <input type="number" id="meal-num" name="meal-num" placeholder="Enter meal number" class="day-input" />
                                 </div>
                                 <input type="submit" value="submit" class="submit-button" />
                             </form>
@@ -109,6 +109,8 @@
             <section class="meal-calendar">
                 <button class="meal-calendar-button"><a href="meal-plan.html"><img src="assets/calendar-lines-svgrepo-com.svg" width="50px" height="50px" /></a></button>
             </section>
+            <div id="success-toast-message">Meal Successfully Added to Plan!</div>
+            <div id="error-toast-message">There was an error, meal not added to plan :[</div>
         </div>
     </main>
     <script src="app.js"></script>

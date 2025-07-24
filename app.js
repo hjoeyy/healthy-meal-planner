@@ -9,7 +9,22 @@ const closeButton = document.querySelector('.close-button');
 const modal = document.getElementById('modal');
 const modalBox = document.querySelector('.modal');
 const modalForm = document.querySelector('.modal-form');
+const allRecipeCards = document.querySelectorAll('.recipe-card');
 makeModalDraggable(modalBox);
+// Meal Plan 
+
+let mealPlan = JSON.parse(localStorage.getItem('mealPlan')) || {
+    monday: [null, null, null, null, null],
+    tuesday: [null, null, null, null, null],
+    wednesday: [null, null, null, null, null],
+    thursday: [null, null, null, null, null],
+    friday: [null, null, null, null, null],
+    saturday: [null, null, null, null, null],
+    sunday: [null, null, null, null, null]
+};
+let selectedRecipe = null;
+let calendarTargetDay = null;
+let calendarTargetMealNum = null;
 
 
 async function getRecipeData(input) {
@@ -66,40 +81,36 @@ function displayError(message) {
     recipeCards.innerHTML = '';
 }
 
-search_btn.addEventListener('click', updateSearchResults);
-search.addEventListener('keypress', event => {
-    if(event.key === 'Enter') {
-        updateSearchResults();
-    }
-});
-
-// Meal Plan 
-
-let mealPlan = {
-    monday: [null, null, null, null, null],
-    tuesday: [null, null, null, null, null],
-    wednesday: [null, null, null, null, null],
-    thursday: [null, null, null, null, null],
-    friday: [null, null, null, null, null],
-    saturday: [null, null, null, null, null],
-    sunday: [null, null, null, null, null]
+if (search_btn) {
+    search_btn.addEventListener('click', updateSearchResults);
 }
+
+if (search) {
+    search.addEventListener('keypress', event => {
+        if(event.key === 'Enter') {
+            updateSearchResults();
+        }
+    });
+}
+
 
 // This function makes the modal draggable by clicking and dragging it
 function makeModalDraggable(modal) {
     let offsetX = 0, offsetY = 0, startX = 0, startY = 0, isDragging = false;
 
     // When mouse is pressed down on the modal, start dragging
-    modal.addEventListener('mousedown', function(e) {
-        isDragging = true;
-        startX = e.clientX; // Mouse X position when drag starts
-        startY = e.clientY; // Mouse Y position when drag starts
-        // Get modal's current position
-        const rect = modal.getBoundingClientRect();
-        offsetX = startX - rect.left;
-        offsetY = startY - rect.top;
-        document.body.style.userSelect = 'none'; // Prevents text selection while dragging
+    if(modal) {
+        modal.addEventListener('mousedown', function(e) {
+            isDragging = true;
+            startX = e.clientX; // Mouse X position when drag starts
+            startY = e.clientY; // Mouse Y position when drag starts
+            // Get modal's current position
+            const rect = modal.getBoundingClientRect();
+            offsetX = startX - rect.left;
+            offsetY = startY - rect.top;
+            document.body.style.userSelect = 'none'; // Prevents text selection while dragging
     });
+    }
 
     // When mouse moves, if dragging, move the modal to follow the mouse
     document.addEventListener('mousemove', function(e) {
@@ -122,25 +133,121 @@ function makeModalDraggable(modal) {
 }
 
 // Listen for clicks on any "Add to Plan" button inside recipe cards
-recipeCards.addEventListener('click', function(e) {
-    if (e.target.classList.contains('add-plan-button')) {
-        modal.classList.add('show-modal'); // Show the modal
-        e.target.classList.add('clicked'); // indicate the specific recipe clicked
-    }
-});
+if (recipeCards) {
+    recipeCards.addEventListener('click', function(e) {
+        if (e.target.classList.contains('add-plan-button')) {
+            selectedRecipe = JSON.parse(e.target.getAttribute('data-recipe'));
+            modal.classList.add('show-modal'); // Show the modal
+        }
+    });
+}
 
 // Listen for clicks on the close button to hide the modal
-closeButton.addEventListener('click', () => {
-    modal.classList.remove('show-modal'); // Hide the modal
-});
+if(closeButton) {
+    closeButton.addEventListener('click', () => {
+        modal.classList.remove('show-modal'); // Hide the modal
+    });
+}
 
 // Listen for clicks on the window; if the click is on the modal background, hide the modal
 window.addEventListener('click', e => {
     e.target === modal ? modal.classList.remove('show-modal') : false;
-})
+});
 
-function updateMealPlan(day, meal_number, meal_plan = {}) {
-    
+function toastSuccessMessage() {
+    var t = document.getElementById('success-toast-message');
+    t.className = "show";
+    setTimeout(function(){ t.className = t.className.replace("show", ""); }, 3000);
 }
-modalForm.addEventListener('submit', updateMealPlan);
 
+function toastErrorMessage() {
+    var t = document.getElementById('error-toast-message');
+    t.className = "show";
+    setTimeout(function(){ t.className = t.className.replace("show", ""); }, 3000);
+}
+
+function updateMealPlan(e) {
+    e.preventDefault();
+    const day = (this.querySelector('[name=day]')).value;
+    const meal_number = Number((this.querySelector('[name=meal-num]')).value) - 1;
+    allRecipeCards.forEach(recipe_card => {
+        const button = recipe_card.querySelector('.add-plan-button');
+        if (!button) return; // skip if no button
+
+        // get data-recipe
+        const recipeData = button.getAttribute('data-recipe');
+        if (!recipeData) return; // skip if no recipe data
+
+        const recipeObj = JSON.parse(recipeData);
+        
+        if (recipeObj.id === selectedRecipe.id) { // check if the recipe matches the clicked one
+            // add recipe to meal plan
+            mealPlan[day][meal_number] = recipeObj;
+            localStorage.setItem('mealPlan', JSON.stringify(mealPlan));
+            modal.classList.remove('show-modal');
+            toastSuccessMessage();
+        }
+    });
+}
+
+if(modalForm) {
+    modalForm.addEventListener('submit', updateMealPlan);
+}
+
+// meal-plan section
+
+const calendar = document.querySelector('.calendar');
+const addMealButton = document.querySelectorAll('.add-meal-button');
+const modalRecipeCards = document.querySelector('.modal-recipe-cards');
+const allModalRecipeCards = document.querySelectorAll('.modal-recipe-card');
+
+function updateCalendar() {
+    
+    for (let day in mealPlan) {
+        //console.log(mealPlan[day])
+        mealPlan[day].forEach((recipe, meal_num) => {
+            const cell = document.querySelector(`.meal[data-day="${day}"][data-meal="${meal_num + 1}"]`);
+            console.log(cell);
+            if (cell) {
+                if (recipe) {
+
+                    cell.innerHTML = `<img src="${recipe.image}" width="100" /><br>${recipe.title}`;
+                } else {
+                    cell.innerHTML = `<button class="calendar-add-meal-btn">+ Add Meal</button>`;
+                    const addBtn = cell.querySelector('.calendar-add-meal-btn');
+                    addBtn.addEventListener('click', function() {
+                        calendarTargetDay = day;
+                        calendarTargetMealNum = meal_num;
+                        openCalendarModal(day, meal_num);
+                        modal.classList.add('show-modal');
+                    });
+                }
+            }
+        });
+    }
+}
+
+function openCalendarModal(day, meal_num) {
+    // Only add the event listener once!
+    if (modalRecipeCards) {
+        // Remove any previous listener to avoid duplicates
+        modalRecipeCards.onclick = function(e) {
+            if (e.target.classList.contains('add-meal-button')) {
+                const recipeData = e.target.getAttribute('data-recipe');
+                if (!recipeData) return;
+                const recipeObj = JSON.parse(recipeData);
+
+                // Use the globally set calendarTargetDay and calendarTargetMealNum
+                mealPlan[calendarTargetDay][calendarTargetMealNum] = recipeObj;
+                localStorage.setItem('mealPlan', JSON.stringify(mealPlan));
+                modal.classList.remove('show-modal');
+                updateCalendar();
+                toastSuccessMessage();
+            }
+        };
+    }
+}
+
+if (document.querySelector('.calendar')) {
+    updateCalendar();
+}
