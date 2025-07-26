@@ -428,7 +428,7 @@
     position: relative;
 }
 
-#success-toast-message {
+#success-toast-message, #clear-success-toast-message {
     visibility: hidden;
     min-width: 250px;
     margin-left: -125px; /* Divide value of min-width by 2 */
@@ -443,7 +443,7 @@
     bottom: 30px; /* 30px from the bottom */
 }
 
-#success-toast-message.show {
+#success-toast-message.show, #clear-success-toast-message.show {
     visibility: visible;
     -webkit-animation: fadein 0.5s, fadeout 0.5s 2.5s;
     animation: fadein 0.5s, fadeout 0.5s 2.5s;

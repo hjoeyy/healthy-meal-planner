@@ -160,6 +160,12 @@ function toastSuccessMessage() {
     setTimeout(function(){ t.className = t.className.replace("show", ""); }, 3000);
 }
 
+function clearAllToastSuccessMessage() {
+    var t = document.getElementById('clear-success-toast-message');
+    t.className = "show";
+    setTimeout(function(){ t.className = t.className.replace("show", ""); }, 3000);
+}
+
 function toastErrorMessage() {
     var t = document.getElementById('error-toast-message');
     t.className = "show";
@@ -200,6 +206,7 @@ const calendar = document.querySelector('.calendar');
 const addMealButton = document.querySelectorAll('.add-meal-button');
 const modalRecipeCards = document.querySelector('.modal-recipe-cards');
 const allModalRecipeCards = document.querySelectorAll('.modal-recipe-card');
+const clearAllButton = document.querySelector('.clear-all');
 
 function updateCalendar() {
     
@@ -211,7 +218,10 @@ function updateCalendar() {
             if (cell) {
                 if (recipe) {
 
-                    cell.innerHTML = `<img src="${recipe.image}" width="100" /><br>${recipe.title}`;
+                    cell.innerHTML = 
+                    `<img src="${recipe.image}" width="100" /><br>${recipe.title}
+                    <button class="update-meal-button">Update Meal</button>
+                    <button class="delete-meal-button">Delete Meal</button>`;
                 } else {
                     cell.innerHTML = `<button class="calendar-add-meal-btn">+ Add Meal</button>`;
                     const addBtn = cell.querySelector('.calendar-add-meal-btn');
@@ -247,6 +257,18 @@ function openCalendarModal(day, meal_num) {
         };
     }
 }
+
+function clearAllMeals() {
+    for (let day in mealPlan) {
+        mealPlan[day] = [null, null, null, null, null];
+    }
+    localStorage.setItem('mealPlan', JSON.stringify(mealPlan));
+    updateCalendar();
+    clearAllToastSuccessMessage();
+}
+
+clearAllButton.addEventListener('click', clearAllMeals);
+
 
 if (document.querySelector('.calendar')) {
     updateCalendar();
