@@ -166,6 +166,17 @@ function clearAllToastSuccessMessage() {
     setTimeout(function(){ t.className = t.className.replace("show", ""); }, 3000);
 }
 
+function updateToastSuccessMessage() {
+    var t = document.getElementById('update-success-toast-message');
+    t.className = "show";
+    setTimeout(function(){ t.className = t.className.replace("show", ""); }, 3000);
+}
+
+function deleteToastSuccessMessage() {
+    var t = document.getElementById('delete-success-toast-message');
+    t.className = "show";
+    setTimeout(function(){ t.className = t.className.replace("show", ""); }, 3000);
+}
 function toastErrorMessage() {
     var t = document.getElementById('error-toast-message');
     t.className = "show";
@@ -208,6 +219,7 @@ const modalRecipeCards = document.querySelector('.modal-recipe-cards');
 const allModalRecipeCards = document.querySelectorAll('.modal-recipe-card');
 const clearAllButton = document.querySelector('.clear-all');
 
+
 function updateCalendar() {
     
     for (let day in mealPlan) {
@@ -222,6 +234,27 @@ function updateCalendar() {
                     `<img src="${recipe.image}" width="100" /><br>${recipe.title}
                     <button class="update-meal-button">Update Meal</button>
                     <button class="delete-meal-button">Delete Meal</button>`;
+
+                    const updateButton = cell.querySelector('.update-meal-button');
+                    const deleteButton = cell.querySelector('.delete-meal-button');
+
+                    if (updateButton) {
+                        updateButton.addEventListener('click', function() {
+                            calendarTargetDay = day;
+                            calendarTargetMealNum = meal_num;
+                            openCalendarModal(day, meal_num);
+                            modal.classList.add('show-modal');
+                        });
+                    }
+
+                    if (deleteButton) {
+                        deleteButton.addEventListener('click', function () {
+                            mealPlan[day][meal_num] = null;
+                            localStorage.setItem('mealPlan', JSON.stringify(mealPlan));
+                            updateCalendar();
+                            deleteToastSuccessMessage();
+                        });
+                    }
                 } else {
                     cell.innerHTML = `<button class="calendar-add-meal-btn">+ Add Meal</button>`;
                     const addBtn = cell.querySelector('.calendar-add-meal-btn');
@@ -247,12 +280,19 @@ function openCalendarModal(day, meal_num) {
                 if (!recipeData) return;
                 const recipeObj = JSON.parse(recipeData);
 
+                
                 // Use the globally set calendarTargetDay and calendarTargetMealNum
+                const wasEmpty = !mealPlan[calendarTargetDay][calendarTargetMealNum];
                 mealPlan[calendarTargetDay][calendarTargetMealNum] = recipeObj;
                 localStorage.setItem('mealPlan', JSON.stringify(mealPlan));
                 modal.classList.remove('show-modal');
                 updateCalendar();
-                toastSuccessMessage();
+
+                if(wasEmpty) {
+                    toastSuccessMessage();
+                } else {
+                     updateToastSuccessMessage();
+                }
             }
         };
     }
@@ -266,6 +306,8 @@ function clearAllMeals() {
     updateCalendar();
     clearAllToastSuccessMessage();
 }
+
+
 
 clearAllButton.addEventListener('click', clearAllMeals);
 
