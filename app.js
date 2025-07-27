@@ -10,6 +10,10 @@ const modal = document.getElementById('modal');
 const modalBox = document.querySelector('.modal');
 const modalForm = document.querySelector('.modal-form');
 const allRecipeCards = document.querySelectorAll('.recipe-card');
+const modalRecipeCards = document.querySelector('.modal-recipe-cards');
+const modalSearch = document.getElementById('modal-search');
+const modalSearchBtn = document.getElementById('modal-search-btn');
+const modalClearAllBtn = document.getElementById('modal-clear-all-btn');
 makeModalDraggable(modalBox);
 // Meal Plan 
 
@@ -46,7 +50,7 @@ async function getRecipeData(input) {
 }
 
 async function updateSearchResults() {
-    const input = search.value;
+    const input = search?.value;
     if (!input) {
         displayError('Results cannot be empty');
         return;
@@ -59,18 +63,27 @@ async function updateSearchResults() {
             return;
         }
         let cardsHTML = '';
+        let modalCardsHTML = '';
         for (let i = 0; i < results.length; i++) {
-            cardsHTML += `
-            <div class="recipe-card">
-                <button class="favorite"><img src="assets/heart-svgrepo-com.svg" alt="favorite-heart-icon" width="30px" height="30px" /></button>
-                <img src=${results[i].image} width="200px" height="200px" />
-                <div class="title-wrapper">
-                    <h3>${results[i].title}</h3>
-                    <button class="add-plan-button">Add to Plan</button>
-                </div>
-            </div>`;
+            if (recipeCards) {
+                const recipeObj = {
+                    id: results[i].id,
+                    title: results[i].title,
+                    image: results[i].image
+                };
+                const recipeData = encodeURIComponent(JSON.stringify(recipeObj));
+                cardsHTML += `
+                <div class="recipe-card">
+                    <button class="favorite"><img src="assets/heart-svgrepo-com.svg" alt="favorite-heart-icon" width="30px" height="30px" /></button>
+                    <img src=${results[i].image} width="200px" height="200px" />
+                    <div class="title-wrapper">
+                        <h3>${results[i].title}</h3>
+                        <button class="add-plan-button" data-recipe="${recipeData}">Add to Plan</button>
+                    </div>
+                </div>`;
+            }
         }
-        recipeCards.innerHTML = cardsHTML;
+        if (recipeCards) recipeCards.innerHTML = cardsHTML;
     } catch (error) {
         displayError('Server error: something went wrong on our end, please try again');
     }
@@ -81,15 +94,10 @@ function displayError(message) {
     recipeCards.innerHTML = '';
 }
 
-if (search_btn) {
+if (search_btn && search && recipeCards) {
     search_btn.addEventListener('click', updateSearchResults);
-}
-
-if (search) {
     search.addEventListener('keypress', event => {
-        if(event.key === 'Enter') {
-            updateSearchResults();
-        }
+        if(event.key === 'Enter') updateSearchResults();
     });
 }
 
@@ -136,8 +144,8 @@ function makeModalDraggable(modal) {
 if (recipeCards) {
     recipeCards.addEventListener('click', function(e) {
         if (e.target.classList.contains('add-plan-button')) {
-            selectedRecipe = JSON.parse(e.target.getAttribute('data-recipe'));
-            modal.classList.add('show-modal'); // Show the modal
+            selectedRecipe = JSON.parse(decodeURIComponent(e.target.getAttribute('data-recipe')));
+            modal.classList.add('show-modal');
         }
     });
 }
@@ -187,24 +195,17 @@ function updateMealPlan(e) {
     e.preventDefault();
     const day = (this.querySelector('[name=day]')).value;
     const meal_number = Number((this.querySelector('[name=meal-num]')).value) - 1;
-    allRecipeCards.forEach(recipe_card => {
-        const button = recipe_card.querySelector('.add-plan-button');
-        if (!button) return; // skip if no button
 
-        // get data-recipe
-        const recipeData = button.getAttribute('data-recipe');
-        if (!recipeData) return; // skip if no recipe data
+    if (!selectedRecipe || !day || isNaN(meal_number)) {
+        toastErrorMessage();
+        return;
+    }
 
-        const recipeObj = JSON.parse(recipeData);
-        
-        if (recipeObj.id === selectedRecipe.id) { // check if the recipe matches the clicked one
-            // add recipe to meal plan
-            mealPlan[day][meal_number] = recipeObj;
-            localStorage.setItem('mealPlan', JSON.stringify(mealPlan));
-            modal.classList.remove('show-modal');
-            toastSuccessMessage();
-        }
-    });
+    mealPlan[day][meal_number] = selectedRecipe;
+    localStorage.setItem('mealPlan', JSON.stringify(mealPlan));
+    modal.classList.remove('show-modal');
+    toastSuccessMessage();
+    updateCalendar?.(); // Only call if function exists (on meal plan page)
 }
 
 if(modalForm) {
@@ -215,9 +216,12 @@ if(modalForm) {
 
 const calendar = document.querySelector('.calendar');
 const addMealButton = document.querySelectorAll('.add-meal-button');
-const modalRecipeCards = document.querySelector('.modal-recipe-cards');
+
 const allModalRecipeCards = document.querySelectorAll('.modal-recipe-card');
 const clearAllButton = document.querySelector('.clear-all');
+
+
+
 
 
 function updateCalendar() {
@@ -262,7 +266,6 @@ function updateCalendar() {
                         calendarTargetDay = day;
                         calendarTargetMealNum = meal_num;
                         openCalendarModal(day, meal_num);
-                        modal.classList.add('show-modal');
                     });
                 }
             }
@@ -271,30 +274,30 @@ function updateCalendar() {
 }
 
 function openCalendarModal(day, meal_num) {
-    // Only add the event listener once!
     if (modalRecipeCards) {
-        // Remove any previous listener to avoid duplicates
-        modalRecipeCards.onclick = function(e) {
-            if (e.target.classList.contains('add-meal-button')) {
-                const recipeData = e.target.getAttribute('data-recipe');
-                if (!recipeData) return;
-                const recipeObj = JSON.parse(recipeData);
-
-                
-                // Use the globally set calendarTargetDay and calendarTargetMealNum
-                const wasEmpty = !mealPlan[calendarTargetDay][calendarTargetMealNum];
-                mealPlan[calendarTargetDay][calendarTargetMealNum] = recipeObj;
-                localStorage.setItem('mealPlan', JSON.stringify(mealPlan));
-                modal.classList.remove('show-modal');
-                updateCalendar();
-
-                if(wasEmpty) {
-                    toastSuccessMessage();
-                } else {
-                     updateToastSuccessMessage();
+        // Always show the modal
+        modal.classList.add('show-modal');
+        // Set up event delegation ONCE
+        if (!modalRecipeCards._listenerSet) {
+            modalRecipeCards.addEventListener('click', function(e) {
+                if (e.target.classList.contains('add-meal-button')) {
+                    const recipeData = e.target.getAttribute('data-recipe');
+                    if (!recipeData) return;
+                    const recipeObj = JSON.parse(decodeURIComponent(recipeData));
+                    const wasEmpty = !mealPlan[calendarTargetDay][calendarTargetMealNum];
+                    mealPlan[calendarTargetDay][calendarTargetMealNum] = recipeObj;
+                    localStorage.setItem('mealPlan', JSON.stringify(mealPlan));
+                    modal.classList.remove('show-modal');
+                    updateCalendar();
+                    if (wasEmpty) {
+                        toastSuccessMessage();
+                    } else {
+                        updateToastSuccessMessage();
+                    }
                 }
-            }
-        };
+            });
+            modalRecipeCards._listenerSet = true; // Prevent duplicate listeners
+        }
     }
 }
 
@@ -314,4 +317,49 @@ clearAllButton.addEventListener('click', clearAllMeals);
 
 if (document.querySelector('.calendar')) {
     updateCalendar();
+}
+
+async function updateModalSearchResults() {
+    const input = modalSearch?.value;
+    if (!input) {
+        // Optionally show an error in the modal
+        return;
+    }
+    try {
+        const { results, cod } = await getRecipeData(input);
+        if (cod === '404') {
+            // Optionally show an error in the modal
+            return;
+        }
+        let modalCardsHTML = '';
+        for (let i = 0; i < results.length; i++) {
+            const recipeObj = {
+                id: results[i].id,
+                title: results[i].title,
+                image: results[i].image
+            };
+            const recipeData = encodeURIComponent(JSON.stringify(recipeObj));
+            modalCardsHTML += `
+            <div class="modal-recipe-card">
+                <img src="${results[i].image}" width="50px" height="50px" />
+                <div class="modal-title-wrapper">
+                    <h3>${results[i].title}</h3>
+                    <button class="add-meal-button" data-recipe="${recipeData}">Add Meal</button>
+                </div>
+            </div>`;
+        }
+        if (modalRecipeCards) modalRecipeCards.innerHTML = modalCardsHTML;
+    } catch (error) {
+        // Optionally show an error in the modal
+    }
+}
+
+if (modalSearchBtn && modalSearch && modalClearAllBtn) {
+    modalSearchBtn.addEventListener('click', updateModalSearchResults);
+    modalSearch.addEventListener('keypress', event => {
+        if(event.key === 'Enter') updateModalSearchResults();
+    });
+    modalClearAllBtn.addEventListener('click', function() {
+        if (modalRecipeCards) modalRecipeCards.innerHTML = '';
+    });
 }
