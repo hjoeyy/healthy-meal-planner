@@ -296,6 +296,8 @@
     grid-template-columns: repeat(3, 1fr);
     gap: 16px;
     align-items: start;
+    overflow: scroll;
+    max-height: 400px;
 }
 
 .modal-recipe-card {

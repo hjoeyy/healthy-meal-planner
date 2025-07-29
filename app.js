@@ -363,3 +363,58 @@ if (modalSearchBtn && modalSearch && modalClearAllBtn) {
         if (modalRecipeCards) modalRecipeCards.innerHTML = '';
     });
 }
+
+// Shopping List
+
+const recipeIds = [];
+const ingredientsList = [];
+const generateShoppingListButton = document.querySelector('.generate-shopping-list');
+const shoppingList = document.querySelector('.shopping-list.ul');
+  
+async function fetchShoppingList() { // fetch the shopping list for the meals
+    
+    for (let day in mealPlan) {
+        for (let mealSlot of mealPlan[day]) { // collect all meal IDs
+            if (mealSlot !== null) {
+                recipeIds.push(mealSlot.id);
+            }
+        }
+    }
+
+
+    for (let id in recipeIds) {
+        const url = `https://api.spoonacular.com/recipes/${id}/ingredientWidget.json`;
+
+        try {
+            const response = await fetch(url);
+    
+            if (!response.ok) {
+                displayError('No results or issues fetching results');
+            }
+            const data = await response.json();
+            const { results, cod } = data;
+
+            if (cod === '404') {
+                displayError('Please enter valid search results');
+                return;
+            }
+            let shoppingListHTML = '';
+
+            for (let ingredient in results.ingredients) {
+                // ingredientsList.push(ingredient.name);
+                shoppingListHTML += `
+                <div class="item"><input type="checkbox" /><li>${ingredient.name}</li></div>
+               `;
+            }
+            if (shoppingList) shoppingList.innerHTML = shoppingListHTML;
+
+        } catch (error) {
+            throw error;
+        } finally {
+            console.log('Final Block');
+        }
+    }
+}
+
+generateShoppingListButton.addEventListener('click', fetchShoppingList);
+
