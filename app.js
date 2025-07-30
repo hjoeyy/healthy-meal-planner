@@ -1,3 +1,6 @@
+console.log("APP.JS LOADED - TEST LOG");
+console.log("window.location.pathname:", window.location.pathname);
+
 const API_KEY = 'e17a54633c7f4e61bdc9b04dc00fd105';
 
 const search = document.getElementById('search');
@@ -14,6 +17,11 @@ const modalRecipeCards = document.querySelector('.modal-recipe-cards');
 const modalSearch = document.getElementById('modal-search');
 const modalSearchBtn = document.getElementById('modal-search-btn');
 const modalClearAllBtn = document.getElementById('modal-clear-all-btn');
+const generateShoppingListButton = document.querySelector('.generate-shopping-list');
+const calendar = document.querySelector('.calendar');
+const addMealButton = document.querySelectorAll('.add-meal-button');
+const allModalRecipeCards = document.querySelectorAll('.modal-recipe-card');
+const clearAllButton = document.querySelector('.clear-all');
 makeModalDraggable(modalBox);
 // Meal Plan 
 
@@ -90,7 +98,7 @@ async function updateSearchResults() {
 }
 
 function displayError(message) {
-    errorMessage.textContent = message;
+    if(errorMessage) errorMessage.textContent = message;
     recipeCards.innerHTML = '';
 }
 
@@ -214,11 +222,6 @@ if(modalForm) {
 
 // meal-plan section
 
-const calendar = document.querySelector('.calendar');
-const addMealButton = document.querySelectorAll('.add-meal-button');
-
-const allModalRecipeCards = document.querySelectorAll('.modal-recipe-card');
-const clearAllButton = document.querySelector('.clear-all');
 
 
 
@@ -230,7 +233,6 @@ function updateCalendar() {
         //console.log(mealPlan[day])
         mealPlan[day].forEach((recipe, meal_num) => {
             const cell = document.querySelector(`.meal[data-day="${day}"][data-meal="${meal_num + 1}"]`);
-            console.log(cell);
             if (cell) {
                 if (recipe) {
 
@@ -312,7 +314,7 @@ function clearAllMeals() {
 
 
 
-clearAllButton.addEventListener('click', clearAllMeals);
+if (clearAllButton) clearAllButton.addEventListener('click', clearAllMeals);
 
 
 if (document.querySelector('.calendar')) {
@@ -365,14 +367,10 @@ if (modalSearchBtn && modalSearch && modalClearAllBtn) {
 }
 
 // Shopping List
-
-const recipeIds = [];
-const ingredientsList = [];
-const generateShoppingListButton = document.querySelector('.generate-shopping-list');
-const shoppingList = document.querySelector('.shopping-list.ul');
   
 async function fetchShoppingList() { // fetch the shopping list for the meals
-    
+    const recipeIds = [];
+    const ingredientsList = [];
     for (let day in mealPlan) {
         for (let mealSlot of mealPlan[day]) { // collect all meal IDs
             if (mealSlot !== null) {
@@ -381,40 +379,54 @@ async function fetchShoppingList() { // fetch the shopping list for the meals
         }
     }
 
-
-    for (let id in recipeIds) {
-        const url = `https://api.spoonacular.com/recipes/${id}/ingredientWidget.json`;
+    for (let id of recipeIds) {
+        console.log("Recipe IDs before API: ", recipeIds);
+        const url = `https://api.spoonacular.com/recipes/${id}/ingredientWidget.json?apiKey=${API_KEY}`;
 
         try {
             const response = await fetch(url);
-    
             if (!response.ok) {
                 displayError('No results or issues fetching results');
+                return;
             }
             const data = await response.json();
-            const { results, cod } = data;
+            const { ingredients, cod } = data;
 
             if (cod === '404') {
                 displayError('Please enter valid search results');
                 return;
             }
-            let shoppingListHTML = '';
-
-            for (let ingredient in results.ingredients) {
-                // ingredientsList.push(ingredient.name);
-                shoppingListHTML += `
-                <div class="item"><input type="checkbox" /><li>${ingredient.name}</li></div>
-               `;
+            for (let ingredient of ingredients) {
+                ingredientsList.push(ingredient.name);
             }
-            if (shoppingList) shoppingList.innerHTML = shoppingListHTML;
-
+            localStorage.setItem('shoppingList', JSON.stringify(ingredientsList));
         } catch (error) {
-            throw error;
+            displayError('Server error: something went wrong on our end, please try again');
+            return;
         } finally {
             console.log('Final Block');
         }
     }
 }
 
-generateShoppingListButton.addEventListener('click', fetchShoppingList);
+
+if (window.location.pathname.endsWith('shopping-list.html')) {
+    console.log("SHOPPING LIST CONDITIONAL ENTERED!");
+    window.addEventListener('DOMContentLoaded', () => {
+        const shoppingList = document.querySelector('.shopping-list-ul');
+        const ingredients = JSON.parse(localStorage.getItem('shoppingList')) || [];
+        let shoppingListHTML = '';
+        console.log("Shopping list page loaded!");
+        console.log("Ingredients from localStorage:", ingredients);
+        console.log("shoppingList element:", shoppingList);
+        for (let ingredient of ingredients) {
+            shoppingListHTML += `
+            <div class="item"><input type="checkbox" /><li>${ingredient}</li></div>
+            `;
+        }
+        if (shoppingList) shoppingList.innerHTML = shoppingListHTML;
+    });
+}
+
+if (generateShoppingListButton) generateShoppingListButton.addEventListener('click', fetchShoppingList);
 
