@@ -268,6 +268,21 @@
     gap: 16px;
     background-color: white;
     padding: 10px 30px;
+    position: relative;
+}
+
+.favorite {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    z-index: 2;
+}
+
+.heart-svg.favorited path {
+    fill: red;
 }
 
 .meal button {
@@ -276,6 +291,8 @@
     cursor: pointer;
     background-color: white;
 }
+
+
 
 .meal img {
     background-color: white;
@@ -431,7 +448,8 @@
 }
 
 #success-toast-message, #clear-success-toast-message, 
-#update-success-toast-message, #delete-success-toast-message {
+#update-success-toast-message, #delete-success-toast-message, 
+#generate-success-toast-message, #clear-list-success-toast-message {
     visibility: hidden;
     min-width: 250px;
     margin-left: -125px; /* Divide value of min-width by 2 */
@@ -447,13 +465,14 @@
 }
 
 #success-toast-message.show, #clear-success-toast-message.show, 
-#update-success-toast-message.show, #delete-success-toast-message.show {
+#update-success-toast-message.show, #delete-success-toast-message.show, 
+#generate-success-toast-message.show, #clear-list-success-toast-message.show {
     visibility: visible;
     -webkit-animation: fadein 0.5s, fadeout 0.5s 2.5s;
     animation: fadein 0.5s, fadeout 0.5s 2.5s;
 }
 
-#error-toast-message {
+#error-toast-message, #errorMessage {
     visibility: hidden;
     min-width: 250px;
     margin-left: -125px; /* Divide value of min-width by 2 */
@@ -468,7 +487,7 @@
     bottom: 30px; /* 30px from the bottom */
 }
 
-#error-toast-message.show {
+#error-toast-message.show, #errorMessage.show {
     visibility: visible;
     -webkit-animation: fadein 0.5s, fadeout 0.5s 2.5s;
     animation: fadein 0.5s, fadeout 0.5s 2.5s;

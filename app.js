@@ -99,7 +99,10 @@ async function updateSearchResults() {
 
 function displayError(message) {
     if(errorMessage) errorMessage.textContent = message;
-    recipeCards.innerHTML = '';
+    if(recipeCards) recipeCards.innerHTML = '';
+    var t = document.getElementById('errorMessage');
+    t.className = "show";
+    setTimeout(function(){ t.className = t.className.replace("show", ""); }, 3000);
 }
 
 if (search_btn && search && recipeCards) {
@@ -193,6 +196,19 @@ function deleteToastSuccessMessage() {
     t.className = "show";
     setTimeout(function(){ t.className = t.className.replace("show", ""); }, 3000);
 }
+
+function generateToastSuccessMessage() {
+    var t = document.getElementById('generate-success-toast-message');
+    t.className = "show";
+    setTimeout(function(){ t.className = t.className.replace("show", ""); }, 3000);
+}
+
+function clearShoppingListToastSuccessMessage() {
+    var t = document.getElementById('clear-list-success-toast-message');
+    t.className = "show";
+    setTimeout(function(){ t.className = t.className.replace("show", ""); }, 3000);
+}
+
 function toastErrorMessage() {
     var t = document.getElementById('error-toast-message');
     t.className = "show";
@@ -237,7 +253,12 @@ function updateCalendar() {
                 if (recipe) {
 
                     cell.innerHTML = 
-                    `<img src="${recipe.image}" width="100" /><br>${recipe.title}
+                    `<button class="favorite">
+                    <svg class="heart-svg" width="30px" height="30px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd" clip-rule="evenodd" d="M12 6.00019C10.2006 3.90317 7.19377 3.2551 4.93923 5.17534C2.68468 7.09558 2.36727 10.3061 4.13778 12.5772C5.60984 14.4654 10.0648 18.4479 11.5249 19.7369C11.6882 19.8811 11.7699 19.9532 11.8652 19.9815C11.9483 20.0062 12.0393 20.0062 12.1225 19.9815C12.2178 19.9532 12.2994 19.8811 12.4628 19.7369C13.9229 18.4479 18.3778 14.4654 19.8499 12.5772C21.6204 10.3061 21.3417 7.07538 19.0484 5.17534C16.7551 3.2753 13.7994 3.90317 12 6.00019Z" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    </button>
+                    <img src="${recipe.image}" width="100" /><br>${recipe.title}
                     <button class="update-meal-button">Update Meal</button>
                     <button class="delete-meal-button">Delete Meal</button>`;
 
@@ -371,6 +392,8 @@ if (modalSearchBtn && modalSearch && modalClearAllBtn) {
 async function fetchShoppingList() { // fetch the shopping list for the meals
     const recipeIds = [];
     const ingredientsList = [];
+    const duplicateRemover = new Set();
+    const uniqueIngredients = [];
     for (let day in mealPlan) {
         for (let mealSlot of mealPlan[day]) { // collect all meal IDs
             if (mealSlot !== null) {
@@ -386,12 +409,17 @@ async function fetchShoppingList() { // fetch the shopping list for the meals
         try {
             const response = await fetch(url);
             if (!response.ok) {
-                displayError('No results or issues fetching results');
+                if (response.status === 402) {
+                    displayError('Error fetching API data, API daily limit reached');
+                } else if (response.status === 401) {
+                    displayError('Error fetching API data on our end');
+                } else {
+                    displayError('No results or issues fetching results');
+                }
                 return;
             }
             const data = await response.json();
             const { ingredients, cod } = data;
-
             if (cod === '404') {
                 displayError('Please enter valid search results');
                 return;
@@ -399,7 +427,14 @@ async function fetchShoppingList() { // fetch the shopping list for the meals
             for (let ingredient of ingredients) {
                 ingredientsList.push(ingredient.name);
             }
-            localStorage.setItem('shoppingList', JSON.stringify(ingredientsList));
+            for (let uniqueIngredient of ingredientsList) {
+                if (!duplicateRemover.has(uniqueIngredient)) {
+                    duplicateRemover.add(uniqueIngredient);
+                    uniqueIngredients.push(uniqueIngredient);
+                }
+            }
+            localStorage.setItem('shoppingList', JSON.stringify(uniqueIngredients));
+            generateToastSuccessMessage();
         } catch (error) {
             displayError('Server error: something went wrong on our end, please try again');
             return;
@@ -411,7 +446,7 @@ async function fetchShoppingList() { // fetch the shopping list for the meals
 
 
 if (window.location.pathname.endsWith('shopping-list.html')) {
-    console.log("SHOPPING LIST CONDITIONAL ENTERED!");
+    let id = 1;
     window.addEventListener('DOMContentLoaded', () => {
         const shoppingList = document.querySelector('.shopping-list-ul');
         const ingredients = JSON.parse(localStorage.getItem('shoppingList')) || [];
@@ -419,14 +454,54 @@ if (window.location.pathname.endsWith('shopping-list.html')) {
         console.log("Shopping list page loaded!");
         console.log("Ingredients from localStorage:", ingredients);
         console.log("shoppingList element:", shoppingList);
-        for (let ingredient of ingredients) {
+        for (let ingredient of ingredients) { // add each ingredient to the shopping list
             shoppingListHTML += `
-            <div class="item"><input type="checkbox" /><li>${ingredient}</li></div>
+            <div class="item"><input type="checkbox" id="${id++}" class="box" /><li>${ingredient}</li></div>
             `;
         }
         if (shoppingList) shoppingList.innerHTML = shoppingListHTML;
+        let boxes = document.getElementsByClassName('box').length;
+
+        function save() { // save checked boxes to localStorage
+            for(let i = 1; i <= boxes; i++) {
+                var checkbox = document.getElementById(String(i));
+                localStorage.setItem("checkbox" + String(i), checkbox.checked);
+            }
+        }
+        
+        for (let i = 1; i <= boxes; i++) { // if user checked then set it as checked to save to localStorage
+            if (localStorage.length > 0) {
+                var checked = JSON.parse(localStorage.getItem("checkbox" + String(i)));
+                document.getElementById(String(i)).checked = checked;
+            }
+        }
+        window.addEventListener('change', save);
     });
 }
 
+const clearShoppingList = document.querySelector('.clear-list');
+const exportOrPrintList = document.querySelector('.export-print');
+
+
 if (generateShoppingListButton) generateShoppingListButton.addEventListener('click', fetchShoppingList);
 
+function clearAllShoppingItems() {
+    let ingredients = JSON.parse(localStorage.getItem('shoppingList')) || [];
+    localStorage.setItem('shoppingList', ingredients = []);
+    const shoppingList = document.querySelector('.shopping-list-ul');
+    if (shoppingList) shoppingList.innerHTML = '';
+    clearShoppingListToastSuccessMessage();
+}
+
+if (clearShoppingList) clearShoppingList.addEventListener('click', clearAllShoppingItems);
+if (exportOrPrintList) exportOrPrintList.addEventListener('click', () => window.print());
+
+
+const favoriteButtons = document.querySelectorAll('.favorite');
+
+favoriteButtons.forEach(button => {
+    const heartSvg = button.querySelector('.heart-svg');
+    button.addEventListener('click', function () {
+        heartSvg.classList.toggle('favorited');
+    });
+});
