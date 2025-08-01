@@ -37,6 +37,7 @@ let mealPlan = JSON.parse(localStorage.getItem('mealPlan')) || {
 let selectedRecipe = null;
 let calendarTargetDay = null;
 let calendarTargetMealNum = null;
+let favoritesList = JSON.parse(localStorage.getItem('favoritesList')) || [];
 
 
 async function getRecipeData(input) {
@@ -253,8 +254,8 @@ function updateCalendar() {
                 if (recipe) {
 
                     cell.innerHTML = 
-                    `<button class="favorite">
-                    <svg class="heart-svg" width="30px" height="30px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    `<button class="favorite" data-id="${recipe.id}">
+                    <svg class="heart-svg${favoritesList.some(fav => fav.id === recipe.id) ? ' favorited' : ''}" width="30px" height="30px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path fill-rule="evenodd" clip-rule="evenodd" d="M12 6.00019C10.2006 3.90317 7.19377 3.2551 4.93923 5.17534C2.68468 7.09558 2.36727 10.3061 4.13778 12.5772C5.60984 14.4654 10.0648 18.4479 11.5249 19.7369C11.6882 19.8811 11.7699 19.9532 11.8652 19.9815C11.9483 20.0062 12.0393 20.0062 12.1225 19.9815C12.2178 19.9532 12.2994 19.8811 12.4628 19.7369C13.9229 18.4479 18.3778 14.4654 19.8499 12.5772C21.6204 10.3061 21.3417 7.07538 19.0484 5.17534C16.7551 3.2753 13.7994 3.90317 12 6.00019Z" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                     </svg>
                     </button>
@@ -294,7 +295,9 @@ function updateCalendar() {
             }
         });
     }
+    attachFavoriteListeners();
 }
+
 
 function openCalendarModal(day, meal_num) {
     if (modalRecipeCards) {
@@ -497,11 +500,45 @@ if (clearShoppingList) clearShoppingList.addEventListener('click', clearAllShopp
 if (exportOrPrintList) exportOrPrintList.addEventListener('click', () => window.print());
 
 
-const favoriteButtons = document.querySelectorAll('.favorite');
 
-favoriteButtons.forEach(button => {
-    const heartSvg = button.querySelector('.heart-svg');
-    button.addEventListener('click', function () {
-        heartSvg.classList.toggle('favorited');
+
+
+
+function attachFavoriteListeners() {
+    const favoriteButtons = document.querySelectorAll('.favorite');
+    favoriteButtons.forEach(button => {
+        // Remove any previous click listeners by replacing the node
+        const newButton = button.cloneNode(true);
+        button.parentNode.replaceChild(newButton, button);
+
+        const heartSvg = newButton.querySelector('.heart-svg');
+        newButton.addEventListener('click', function () {
+            const mealID = this.dataset.id;
+            heartSvg.classList.toggle('favorited');
+            let foundMeal = null;
+            Object.keys(mealPlan).forEach(day => {
+                mealPlan[day].forEach(meal => {
+                    if (meal && meal.id === Number(mealID)) {
+                        foundMeal = meal;
+                    }
+                });
+            });
+            if (!foundMeal) return;
+            if (heartSvg.classList.contains('favorited')) {
+                if (!favoritesList.some(fav => fav.id === foundMeal.id)) {
+                    favoritesList.push(foundMeal);
+                }
+            } else {
+                const index = favoritesList.findIndex(fav => fav.id === foundMeal.id);
+                if (index !== -1) {
+                    favoritesList.splice(index, 1);
+                }
+            }
+            localStorage.setItem('favoritesList', JSON.stringify(favoritesList));
+        });
     });
-});
+}
+
+function hi() {
+    console.log(favoritesList);
+}
