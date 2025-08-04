@@ -84,8 +84,19 @@
                         </div>
                     </section>
                 </section>
+                <section class="modal-container" id="confirm-modal">
+                    <section class="confirm-modal">
+                        <button class="close-button" id="close">x</button>
+                        <div class="modal-content">
+                            <h1>A meal already exists here. Do you want to overwrite it?</h1>
+                            <button id="confirm-yes">Yes</button>
+                            <button id="confirm-no">No</button>
+                        </div>
+                    </section>
+                </section>
             </section>
             <div id="success-toast-message">Meal Successfully Added to Plan!</div>
+            <div id="errorMessage" class="error-message"></div>
             <div id="error-toast-message">There was an error, meal not added to plan :[</div>
         </div>
     </main>

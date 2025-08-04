@@ -157,7 +157,7 @@
     z-index: 1000;
 }
 
-.modal {
+.modal, .confirm-modal {
     background: #98ecb4;
     display: block;
     border-radius: 5px;

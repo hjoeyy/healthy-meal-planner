@@ -10,13 +10,17 @@ const recipeCards = document.querySelector('.recipe-cards');
 const addPlanButton = document.querySelectorAll('.add-plan-button');
 const closeButton = document.querySelector('.close-button');
 const modal = document.getElementById('modal');
+const confirmModal = document.getElementById('confirm-modal');
 const modalBox = document.querySelector('.modal');
+const confirmModalBox = document.querySelector('.confirm-modal');
 const modalForm = document.querySelector('.modal-form');
 const allRecipeCards = document.querySelectorAll('.recipe-card');
 const modalRecipeCards = document.querySelector('.modal-recipe-cards');
 const modalSearch = document.getElementById('modal-search');
 const modalSearchBtn = document.getElementById('modal-search-btn');
 const modalClearAllBtn = document.getElementById('modal-clear-all-btn');
+const confirmYes = document.getElementById('confirm-yes');
+const confirmNo = document.getElementById('confirm-no');
 const generateShoppingListButton = document.querySelector('.generate-shopping-list');
 const calendar = document.querySelector('.calendar');
 const addMealButton = document.querySelectorAll('.add-meal-button');
@@ -24,6 +28,7 @@ const allModalRecipeCards = document.querySelectorAll('.modal-recipe-card');
 const clearAllButton = document.querySelector('.clear-all');
 const favoriteRecipeCards = document.querySelector('.favorite-recipe-cards');
 makeModalDraggable(modalBox);
+makeModalDraggable(confirmModalBox);
 // Meal Plan 
 
 let mealPlan = JSON.parse(localStorage.getItem('mealPlan')) || {
@@ -243,14 +248,32 @@ function toastErrorMessage() {
 
 function updateMealPlan(e) {
     e.preventDefault();
-    const day = (this.querySelector('[name=day]')).value;
+    const day = (this.querySelector('[name=day]')).value.toLowerCase();
+    const validDays = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+    if (!validDays.includes(day)) { // make sure user is entering a valid day
+        displayError('Not a valid day!');
+        return;
+    }
     const meal_number = Number((this.querySelector('[name=meal-num]')).value) - 1;
+    console.log(meal_number);
+    if(meal_number < 0 || meal_number >= 5) { // make sure user is not going out of range
+        displayError('Please enter a number between 1 and 5');
+        return;
+    }
 
     if (!selectedRecipe || !day || isNaN(meal_number)) {
         toastErrorMessage();
         return;
     }
 
+    if (mealPlan[day][meal_number]) {
+        // ask user if they want to overwrite the existing meal
+        confirmModal.classList.add('show-modal');
+
+        // if yes, overwrite
+
+        // else keep current meal
+    }
     mealPlan[day][meal_number] = selectedRecipe;
     localStorage.setItem('mealPlan', JSON.stringify(mealPlan));
     modal.classList.remove('show-modal');
