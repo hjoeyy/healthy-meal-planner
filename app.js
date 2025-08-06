@@ -8,7 +8,7 @@ const search_btn = document.getElementById('submit-btn');
 const errorMessage = document.getElementById('errorMessage');
 const recipeCards = document.querySelector('.recipe-cards');
 const addPlanButton = document.querySelectorAll('.add-plan-button');
-const closeButton = document.querySelector('.close-button');
+const closeButtons = document.querySelectorAll('.close-button');
 const modal = document.getElementById('modal');
 const confirmModal = document.getElementById('confirm-modal');
 const modalBox = document.querySelector('.modal');
@@ -43,29 +43,65 @@ let mealPlan = JSON.parse(localStorage.getItem('mealPlan')) || {
 let selectedRecipe = null;
 let calendarTargetDay = null;
 let calendarTargetMealNum = null;
+let pendingRecipe = null;
+let specificDay = null;
+let specific_meal_number = null;
 let favoritesList = JSON.parse(localStorage.getItem('favoritesList')) || [];
+
+function getErrorMessage(statusCode) {
+    switch (statusCode) {
+        case 401:
+            return "Authentication error - please check API configuration";
+        case 402:
+            return "Daily API limit reached - try again tomorrow";
+        case 403:
+            return "Access forbidden - please check API permissions";
+        case 404:
+            return "No recipes found - try a different search term";
+        case 429:
+            return "Too many requests - please wait a moment and try again";
+        case 500:
+            return "Server error - please try again later";
+        case 502:
+        case 503:
+        case 504:
+            return "Service temporarily unavailable - please try again later";
+        default:
+            return "Something went wrong - please try again";
+    }
+}
 
 
 async function getRecipeData(input) {
     const url = `https://api.spoonacular.com/recipes/complexSearch?query=${input}&apiKey=${API_KEY}`;
+    console.log("Making API request to: ", url);
 
     try {
         const response = await fetch(url);
-
+        console.log("Response status: ", response.status);
+        console.log("Response: ", response);
         if (!response.ok) {
-            displayError('No results or issues fetching results');
+            const errorMessage = getErrorMessage(response.status);
+            console.error("API Error: ", response.status, response.statusText);
+            throw new Error(errorMessage); // ← Throw the error instead of just displaying it
         }
         const data = await response.json();
+        console.log("✅ API Response:", data);
         return data;
     } catch (error) {
+        console.error("💥 getRecipeData error:", error);
         throw error;
     } finally {
         console.log('Final Block');
     }
 }
 
-async function updateSearchResults() {
+async function updateSearchResults(e) {
+    if (e) e.preventDefault(); // prevent form default from happening
+    console.log("updateSearchResults called!");
+    console.log("Search input value:", search?.value);
     const input = search?.value;
+    console.log("Input: ", input);
     if (!input) {
         displayError('Results cannot be empty');
         return;
@@ -73,6 +109,10 @@ async function updateSearchResults() {
 
     try {
         const { results, cod } = await getRecipeData(input);
+        if(!results || results.length === 0) {
+            displayError('No recipes found. Try a different search term');
+            return;
+        }
         if (cod === '404') {
             displayError('Please enter valid search results');
             return;
@@ -104,7 +144,13 @@ async function updateSearchResults() {
         if (recipeCards) recipeCards.innerHTML = cardsHTML;
         attachFavoriteListeners();
     } catch (error) {
-        displayError('Server error: something went wrong on our end, please try again');
+        console.error('Search error: ', error);
+
+        if (error.name === 'TypeError' && error.message.includes('fetch')) {
+            displayError('Network error - please check your internet connection');
+        } else {
+            displayError(error.message || 'Server error: something went wrong on our end, please try again');
+        }
     }
 }
 
@@ -193,9 +239,12 @@ if (favoriteRecipeCards) {
 }
 
 // Listen for clicks on the close button to hide the modal
-if(closeButton) {
-    closeButton.addEventListener('click', () => {
-        modal.classList.remove('show-modal'); // Hide the modal
+if(closeButtons) {
+    closeButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+            modal.classList.remove('show-modal'); // Hide the modal
+            confirmModal.classList.remove('show-modal');
+        });
     });
 }
 
@@ -269,16 +318,42 @@ function updateMealPlan(e) {
     if (mealPlan[day][meal_number]) {
         // ask user if they want to overwrite the existing meal
         confirmModal.classList.add('show-modal');
-
+        modal.classList.remove('show-modal');
+        pendingRecipe = selectedRecipe; 
+        specificDay = day;
+        specific_meal_number = meal_number;
+        return;
         // if yes, overwrite
-
-        // else keep current meal
+    } else {
+        mealPlan[day][meal_number] = selectedRecipe;
+        localStorage.setItem('mealPlan', JSON.stringify(mealPlan));
+        modal.classList.remove('show-modal');
+        toastSuccessMessage();
+        updateCalendar?.();
     }
-    mealPlan[day][meal_number] = selectedRecipe;
-    localStorage.setItem('mealPlan', JSON.stringify(mealPlan));
-    modal.classList.remove('show-modal');
-    toastSuccessMessage();
-    updateCalendar?.(); // Only call if function exists (on meal plan page)
+}
+
+if (confirmYes) {
+    confirmYes.addEventListener('click', () => {
+        mealPlan[specificDay][specific_meal_number] = pendingRecipe;
+        localStorage.setItem('mealPlan', JSON.stringify(mealPlan));
+        confirmModal.classList.remove('show-modal');
+        toastSuccessMessage();
+        updateCalendar?.(); // Only call if function exists (on meal plan page)
+        // Reset temp vars
+        specificDay = null;
+        specific_meal_number = null;
+        pendingRecipe = null;
+    });
+}
+
+if (confirmNo) {
+    confirmNo.addEventListener('click', () => {
+        confirmModal.classList.remove('show-modal');
+        specificDay = null;
+        specific_meal_number = null;
+        pendingRecipe = null;
+    });
 }
 
 if(modalForm) {
