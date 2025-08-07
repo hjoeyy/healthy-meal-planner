@@ -1,0 +1,1 @@
+A project that uses an API full of meal recipes to search for and track in a weekly meal plan calendar, generate a shopping list for the necessary ingredients, and have the option to have favorited meals to save. This app is designed to make meal tracking easy for the user in order to reach their health & fitness goals.
