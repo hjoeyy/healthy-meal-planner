@@ -265,6 +265,30 @@ window.addEventListener('click', e => {
     e.target === modal ? modal.classList.remove('show-modal') : false;
 });
 
+// Global keyboard navigation - Esc key closes modals from anywhere
+document.addEventListener('keydown', event => {
+    if (event.key === 'Escape') {
+        // Close any open modals
+        if (modal && modal.classList.contains('show-modal')) {
+            modal.classList.remove('show-modal');
+        }
+        if (confirmModal && confirmModal.classList.contains('show-modal')) {
+            confirmModal.classList.remove('show-modal');
+        }
+        
+        // Clear any pending operations
+        selectedRecipe = null;
+        pendingRecipe = null;
+        specificDay = null;
+        specific_meal_number = null;
+    }
+});
+
+// Listen for clicks on the window; if the click is on the modal background, hide the modal
+window.addEventListener('click', e => {
+    e.target === modal ? modal.classList.remove('show-modal') : false;
+});
+
 function toastSuccessMessage() {
     var t = document.getElementById('success-toast-message');
     t.className = "show";
@@ -307,6 +331,21 @@ function toastErrorMessage() {
     setTimeout(function(){ t.className = t.className.replace("show", ""); }, 3000);
 }
 
+function safeSetLocalStorage(key, value) {
+    try {
+        localStorage.setItem(key, JSON.stringify(value));
+    }
+    catch (error) {
+        console.error(error.message);
+        displayError(error.message);
+        if(error.name === 'QuotaExceededError') {
+            displayError('Local storage quota limit exceeded!');
+        }
+        return false;
+    }
+    return true;
+}
+
 function updateMealPlan(e) {
     e.preventDefault();
     const day = (this.querySelector('[name=day]')).value.toLowerCase();
@@ -338,7 +377,7 @@ function updateMealPlan(e) {
         // if yes, overwrite
     } else {
         mealPlan[day][meal_number] = selectedRecipe;
-        localStorage.setItem('mealPlan', JSON.stringify(mealPlan));
+        safeSetLocalStorage('mealPlan', mealPlan);
         modal.classList.remove('show-modal');
         toastSuccessMessage();
         updateCalendar?.();
@@ -348,7 +387,7 @@ function updateMealPlan(e) {
 if (confirmYes) {
     confirmYes.addEventListener('click', () => {
         mealPlan[specificDay][specific_meal_number] = pendingRecipe;
-        localStorage.setItem('mealPlan', JSON.stringify(mealPlan));
+        safeSetLocalStorage('mealPlan', mealPlan);
         confirmModal.classList.remove('show-modal');
         toastSuccessMessage();
         updateCalendar?.(); // Only call if function exists (on meal plan page)
@@ -413,7 +452,7 @@ function updateCalendar() {
                     if (deleteButton) {
                         deleteButton.addEventListener('click', function () {
                             mealPlan[day][meal_num] = null;
-                            localStorage.setItem('mealPlan', JSON.stringify(mealPlan));
+                            safeSetLocalStorage('mealPlan', mealPlan);
                             updateCalendar();
                             deleteToastSuccessMessage();
                         });
@@ -447,7 +486,7 @@ function openCalendarModal(day, meal_num) {
                     const recipeObj = JSON.parse(decodeURIComponent(recipeData));
                     const wasEmpty = !mealPlan[calendarTargetDay][calendarTargetMealNum];
                     mealPlan[calendarTargetDay][calendarTargetMealNum] = recipeObj;
-                    localStorage.setItem('mealPlan', JSON.stringify(mealPlan));
+                    safeSetLocalStorage('mealPlan', mealPlan);
                     modal.classList.remove('show-modal');
                     updateCalendar();
                     if (wasEmpty) {
@@ -466,7 +505,7 @@ function clearAllMeals() {
     for (let day in mealPlan) {
         mealPlan[day] = [null, null, null, null, null];
     }
-    localStorage.setItem('mealPlan', JSON.stringify(mealPlan));
+    safeSetLocalStorage('mealPlan', mealPlan);
     updateCalendar();
     clearAllToastSuccessMessage();
 }
@@ -582,7 +621,7 @@ async function fetchShoppingList() { // fetch the shopping list for the meals
                     uniqueIngredients.push(uniqueIngredient);
                 }
             }
-            localStorage.setItem('shoppingList', JSON.stringify(uniqueIngredients));
+            safeSetLocalStorage('shoppingList', uniqueIngredients);
             generateToastSuccessMessage();
         } catch (error) {
             displayError('Server error: something went wrong on our end, please try again');
@@ -615,7 +654,8 @@ if (window.location.pathname.endsWith('shopping-list.html')) {
         function save() { // save checked boxes to localStorage
             for(let i = 1; i <= boxes; i++) {
                 var checkbox = document.getElementById(String(i));
-                localStorage.setItem("checkbox" + String(i), checkbox.checked);
+                //localStorage.setItem("checkbox" + String(i), checkbox.checked);
+                safeSetLocalStorage("checkbox" + String(i), checked)
             }
         }
         
@@ -636,8 +676,8 @@ const exportOrPrintList = document.querySelector('.export-print');
 if (generateShoppingListButton) generateShoppingListButton.addEventListener('click', fetchShoppingList);
 
 function clearAllShoppingItems() {
-    let ingredients = JSON.parse(localStorage.getItem('shoppingList')) || [];
-    localStorage.setItem('shoppingList', ingredients = []);
+    //localStorage.setItem('shoppingList', ingredients = []);
+    safeSetLocalStorage('shoppingList', []);
     const shoppingList = document.querySelector('.shopping-list-ul');
     if (shoppingList) shoppingList.innerHTML = '';
     clearShoppingListToastSuccessMessage();
@@ -684,7 +724,7 @@ function attachFavoriteListeners() {
                     console.log('Found meal: ', foundMeal);
                     favoritesList.push(foundMeal);
                     console.log('After push:', favoritesList);
-                    localStorage.setItem('favoritesList', JSON.stringify(favoritesList));
+                    safeSetLocalStorage('favoritesList', favoritesList);
                 }
             } else {
                 const index = favoritesList.findIndex(fav => {
@@ -695,7 +735,7 @@ function attachFavoriteListeners() {
                     console.log('Before removal:', favoritesList);
                     favoritesList.splice(index, 1);
                     console.log('After removal:', favoritesList);
-                    localStorage.setItem('favoritesList', JSON.stringify(favoritesList));
+                    safeSetLocalStorage('favoritesList', favoritesList);
                     console.log('localStorage after set:', localStorage.getItem('favoritesList'));
                     if (window.location.pathname.endsWith('favorites.html')) {
                         loadFavorites();
