@@ -27,6 +27,8 @@ const addMealButton = document.querySelectorAll('.add-meal-button');
 const allModalRecipeCards = document.querySelectorAll('.modal-recipe-card');
 const clearAllButton = document.querySelector('.clear-all');
 const favoriteRecipeCards = document.querySelector('.favorite-recipe-cards');
+const searchClearAllBtn = document.querySelector('.search-clear-all')
+const spinner = document.querySelector('.spinner');
 makeModalDraggable(modalBox);
 makeModalDraggable(confirmModalBox);
 // Meal Plan 
@@ -74,22 +76,20 @@ function getErrorMessage(statusCode) {
 
 async function getRecipeData(input) {
     const url = `https://api.spoonacular.com/recipes/complexSearch?query=${input}&apiKey=${API_KEY}`;
-    console.log("Making API request to: ", url);
 
     try {
+        if (spinner) spinner.style.display = 'block';
         const response = await fetch(url);
-        console.log("Response status: ", response.status);
-        console.log("Response: ", response);
         if (!response.ok) {
             const errorMessage = getErrorMessage(response.status);
             console.error("API Error: ", response.status, response.statusText);
             throw new Error(errorMessage); // ← Throw the error instead of just displaying it
         }
         const data = await response.json();
-        console.log("✅ API Response:", data);
+        if (spinner) spinner.style.display = 'none';
         return data;
     } catch (error) {
-        console.error("💥 getRecipeData error:", error);
+        if (spinner) spinner.style.display = 'none';
         throw error;
     } finally {
         console.log('Final Block');
@@ -143,6 +143,7 @@ async function updateSearchResults(e) {
         }
         if (recipeCards) recipeCards.innerHTML = cardsHTML;
         attachFavoriteListeners();
+        search.value = '';
     } catch (error) {
         console.error('Search error: ', error);
 
@@ -163,11 +164,16 @@ function displayError(message) {
 }
 
 function attachSearchListeners() {
-    console.log("Attaching search listeners", search_btn, search, recipeCards);
-    if (search_btn && search && recipeCards) {
+    if (search_btn && search && recipeCards && searchClearAllBtn) {
         search_btn.addEventListener('click', updateSearchResults);
-        search.addEventListener('keypress', event => {
-            if(event.key === 'Enter') updateSearchResults();
+        search.addEventListener('keydown', event => {
+            if (event.key === 'Enter') updateSearchResults();
+        });
+        searchClearAllBtn.addEventListener('click', function() {
+            if (recipeCards) recipeCards.innerHTML = '';
+        });
+        search.addEventListener('keydown', event => {
+            if (event.key === 'Delete' && recipeCards) recipeCards.innerHTML = '';
         });
     }
 }
@@ -244,6 +250,12 @@ if(closeButtons) {
         btn.addEventListener('click', () => {
             modal.classList.remove('show-modal'); // Hide the modal
             confirmModal.classList.remove('show-modal');
+        });
+        btn.addEventListener('keydown', event => {
+            if (event.key === 'Escape') {
+                modal.classList.remove('show-modal'); 
+                confirmModal.classList.remove('show-modal');
+            }
         });
     });
 }
@@ -470,8 +482,10 @@ if (document.querySelector('.calendar')) {
 
 async function updateModalSearchResults() {
     const input = modalSearch?.value;
+    if (spinner) spinner.style.display = 'block';
     if (!input) {
         // Optionally show an error in the modal
+        displayError("Invalid input");
         return;
     }
     try {
@@ -498,8 +512,17 @@ async function updateModalSearchResults() {
             </div>`;
         }
         if (modalRecipeCards) modalRecipeCards.innerHTML = modalCardsHTML;
+        if (spinner) spinner.style.display = 'none';
+        modalSearch.value = '';
     } catch (error) {
         // Optionally show an error in the modal
+        if (spinner) spinner.style.display = 'none';
+        console.error('Search error: ', error);
+        if (error.name === 'TypeError' && error.message.includes('fetch')) {
+            displayError('Network error - please check your internet connection');
+        } else {
+            displayError(error.message || 'Server error: something went wrong on our end, please try again');
+        }
     }
 }
 
@@ -527,7 +550,7 @@ async function fetchShoppingList() { // fetch the shopping list for the meals
             }
         }
     }
-
+    if (spinner) spinner.style.display = 'block';
     for (let id of recipeIds) {
         console.log("Recipe IDs before API: ", recipeIds);
         const url = `https://api.spoonacular.com/recipes/${id}/ingredientWidget.json?apiKey=${API_KEY}`;
@@ -568,6 +591,7 @@ async function fetchShoppingList() { // fetch the shopping list for the meals
             console.log('Final Block');
         }
     }
+    if (spinner) spinner.style.display = 'none';
 }
 
 

@@ -32,10 +32,12 @@
                 <form action="#">
                     <input type="text" id="search" placeholder="Search recipes...">
                     <input id="submit-btn" class="submit-btn" type="submit" value="🔍">
+                    <button class="search-clear-all">Clear Results</button>
                 </form>
                 <div id="errorMessage" class="error-message"></div>
             </section>
             <section class="recipes">
+                <div class="spinner"></div>
                 <div class="recipe-cards"></div>
                 <section class="modal-container" id="modal">
                     <section class="modal">
