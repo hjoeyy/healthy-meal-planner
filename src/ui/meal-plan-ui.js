@@ -1,10 +1,20 @@
 import { safeSetLocalStorage, getJSON } from '../storage.js';
 import { displayError, toastSuccessMessage, clearAllToastSuccessMessage, updateToastSuccessMessage, deleteToastSuccessMessage, 
     generateToastSuccessMessage, clearShoppingListToastSuccessMessage, toastErrorMessage, getErrorMessage } from '../ui/toast.js';
-import { updateMealPlan } from '../pages/meal-plan.js';
 import { attachFavoriteListeners } from './favorites-ui.js';
+import { state } from '../state.js';
 
-
+export function initializeMealPlan() {
+    state.mealPlan = getJSON('mealPlan', {
+        monday: [null, null, null, null, null],
+        tuesday: [null, null, null, null, null],
+        wednesday: [null, null, null, null, null],
+        thursday: [null, null, null, null, null],
+        friday: [null, null, null, null, null],
+        saturday: [null, null, null, null, null],
+        sunday: [null, null, null, null, null]
+    });
+}
 
 
 

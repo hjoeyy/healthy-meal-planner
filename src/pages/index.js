@@ -1,9 +1,66 @@
 import { getJSON, getString, safeSetLocalStorage } from '../storage.js';
-import { displayError, toastSuccessMessage, clearAllToastSuccessMessage, updateToastSuccessMessage, deleteToastSuccessMessage, 
-    generateToastSuccessMessage, clearShoppingListToastSuccessMessage, toastErrorMessage, getErrorMessage } from '../ui/toast.js';
+import { displayError, toastSuccessMessage, toastErrorMessage } from '../ui/toast.js';
 import { getRecipeData } from '../api.js';
-import { attachFavoriteListeners, loadFavorites } from '../ui/favorites-ui.js';
+import { attachFavoriteListeners } from '../ui/favorites-ui.js';
 import { makeModalDraggable, setupModalListeners } from '../ui/modal.js';
+import { getMealPlan } from '../ui/meal-plan-ui.js';
+import { state } from '../state.js';
+
+// Initialize state
+let mealPlan = getMealPlan();
+let pendingRecipe = null;
+let specificDay = null;
+let specific_meal_number = null;
+
+
+// DOM Elements
+const modalForm = document.querySelector('.modal-form');
+const confirmYes = document.getElementById('confirm-yes');
+const confirmNo = document.getElementById('confirm-no');
+
+
+// Remove duplicate updateMealPlan function
+// Move form handling to a separate function
+function handleModalForm(e) {
+    e.preventDefault();
+    const day = (this.querySelector('[name=day]')).value.toLowerCase();
+    const validDays = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+    
+    if (!validDays.includes(day)) {
+        displayError('Not a valid day!');
+        return;
+    }
+
+    const meal_number = Number((this.querySelector('[name=meal-num]')).value) - 1;
+
+    if(meal_number < 0 || meal_number >= 5) {
+        displayError('Please enter a number between 1 and 5');
+        return;
+    }
+
+    if (!selectedRecipe || !day || isNaN(meal_number)) {
+        toastErrorMessage();
+        return;
+    }
+
+    if (mealPlan[day][meal_number]) {
+        confirmModal.classList.add('show-modal');
+        modal.classList.remove('show-modal');
+        pendingRecipe = selectedRecipe;
+        specificDay = day;
+        specific_meal_number = meal_number;
+    } else {
+        mealPlan[day][meal_number] = selectedRecipe;
+        safeSetLocalStorage('mealPlan', mealPlan);
+        modal.classList.remove('show-modal');
+        toastSuccessMessage();
+    }
+}
+
+// Update event listener
+if (modalForm) {
+    modalForm.addEventListener('submit', handleModalForm);
+}
 
 
 console.log('hello world');
@@ -96,6 +153,44 @@ if (recipeCards) {
     });
 }
 
+function updateMealPlan(e) {
+    e.preventDefault();
+    const day = (this.querySelector('[name=day]')).value.toLowerCase();
+    const validDays = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+    if (!validDays.includes(day)) { // make sure user is entering a valid day
+        displayError('Not a valid day!');
+        return;
+    }
+    const meal_number = Number((this.querySelector('[name=meal-num]')).value) - 1;
+    console.log(meal_number);
+    if(meal_number < 0 || meal_number >= 5) { // make sure user is not going out of range
+        displayError('Please enter a number between 1 and 5');
+        return;
+    }
+
+    if (!selectedRecipe || !day || isNaN(meal_number)) {
+        toastErrorMessage();
+        return;
+    }
+
+    if (mealPlan[day][meal_number]) {
+        // ask user if they want to overwrite the existing meal
+        confirmModal.classList.add('show-modal');
+        modal.classList.remove('show-modal');
+        pendingRecipe = selectedRecipe; 
+        specificDay = day;
+        specific_meal_number = meal_number;
+        return;
+        // if yes, overwrite
+    } else {
+        mealPlan[day][meal_number] = selectedRecipe;
+        safeSetLocalStorage('mealPlan', mealPlan);
+        modal.classList.remove('show-modal');
+        toastSuccessMessage();
+        updateCalendar?.();
+    }
+}
+
 function attachSearchListeners() {
     if (search_btn && search && recipeCards && searchClearAllBtn) {
         search_btn.addEventListener('click', updateSearchResults);
@@ -112,7 +207,49 @@ function attachSearchListeners() {
 }
 
 window.addEventListener('DOMContentLoaded', () => {
-    attachSearchListeners();
-});
 
+// Setup modal listeners
+    setupModalListeners({
+        modal,
+        confirmModal,
+        closeButtons,
+        modalForm,
+        onFormSubmit: handleModalForm
+    });
+
+    // Add confirm modal button handlers
+    if (confirmYes) {
+        confirmYes.addEventListener('click', () => {
+            // Update meal plan with pending recipe
+            mealPlan[specificDay][specific_meal_number] = pendingRecipe;
+            safeSetLocalStorage('mealPlan', mealPlan);
+            
+            // Close confirm modal
+            confirmModal.classList.remove('show-modal');
+            
+            // Show success message
+            toastSuccessMessage();
+            
+            // Reset state
+            pendingRecipe = null;
+            specificDay = null;
+            specific_meal_number = null;
+        });
+    }
+
+    if (confirmNo) {
+        confirmNo.addEventListener('click', () => {
+            // Just close the confirm modal
+            confirmModal.classList.remove('show-modal');
+            
+            // Reset state
+            pendingRecipe = null;
+            specificDay = null;
+            specific_meal_number = null;
+        });
+    }
+
+    attachSearchListeners();
+
+});
 

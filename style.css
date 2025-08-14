@@ -183,6 +183,10 @@
     z-index: 1000;
 }
 
+.modal-container.show-modal {
+    display: block;
+}
+
 .modal, .confirm-modal {
     background: #98ecb4;
     display: block;
@@ -244,10 +248,6 @@
     border: none;
     color: #ffffff;
     cursor: pointer;
-}
-
-.modal-container.show-modal {
-    display: block;
 }
 
 .add-plan-button {

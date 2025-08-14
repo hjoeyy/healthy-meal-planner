@@ -1,5 +1,8 @@
 import { attachFavoriteListeners, loadFavorites } from '../ui/favorites-ui.js';
 
+const favoriteRecipeCards = document.querySelector('.favorite-recipe-cards');
+let selectedRecipe = null;
+
 if (window.location.pathname.endsWith('favorites.html')) {
     loadFavorites();
 }

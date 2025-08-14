@@ -1,4 +1,6 @@
 import { getRecipeData } from '../api.js';
+import { displayError, toastSuccessMessage, clearAllToastSuccessMessage, updateToastSuccessMessage, deleteToastSuccessMessage, 
+    generateToastSuccessMessage, clearShoppingListToastSuccessMessage, toastErrorMessage, getErrorMessage } from '../ui/toast.js';
 
 
 const modalBox = document.querySelector('.modal');
@@ -55,44 +57,46 @@ export function makeModalDraggable(modal) {
 }
 
 export function setupModalListeners({modal, confirmModal, closeButtons, modalForm, onFormSubmit}) {
-    //if (!modal || !confirmModal) return; // check iuf bnull
+    //if (!modal || !confirmModal) return; // check if null
 
-    if(closeButtons && modal && confirmModal) {
-        closeButtons.forEach(btn => {
+    const mainModalContainer = document.querySelector('.modal-container');
+    const confirmModalContainer = document.getElementById('confirm-modal');
+
+    console.log('DEBUG: Modal Elements:', {
+        mainModalExists: !!mainModalContainer,
+        confirmModalExists: !!confirmModalContainer,
+        closeButtonsCount: closeButtons?.length
+    });
+
+
+    if(closeButtons) {
+        closeButtons.forEach((btn, index) => {
             btn.addEventListener('click', (e) => {
+                console.log('Close button clicked');
                 e.preventDefault();
                 e.stopPropagation(); // Prevent event from bubbling to window
-                if (modal) modal.classList.remove('show-modal');
-                if (confirmModal) confirmModal.classList.remove('show-modal');
+                mainModalContainer?.classList.remove('show-modal');
+                confirmModalContainer?.classList.remove('show-modal');
             });
         });
     }
     
     // Close on click outside
     window.addEventListener('click', (e) => {
-        // Check if click is on modal background (the overlay)
-        if (e.target === modal || e.target.closest('.modal-container') === modal) {
-            modal.classList.remove('show-modal');
+        console.log('Click target:', e.target.className);
+        if (e.target === mainModalContainer) {
+            mainModalContainer.classList.remove('show-modal');
         }
-        if (e.target === confirmModal || e.target.closest('.modal-container') === confirmModal) {
-            confirmModal.classList.remove('show-modal');
+        if (e.target === confirmModalContainer) {
+            confirmModalContainer.classList.remove('show-modal');
         }
     });
 
        // Close on Escape key
-       document.addEventListener('keydown', (e) => {
+    document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') {
-            if (modal && modal.classList.contains('show-modal')) {
-                modal.classList.remove('show-modal');
-            }
-            if (confirmModal && confirmModal.classList.contains('show-modal')) {
-                confirmModal.classList.remove('show-modal');
-            }
-            // Clear any pending operations
-            selectedRecipe = null;
-            pendingRecipe = null;
-            specificDay = null;
-            specific_meal_number = null;
+            mainModalContainer?.classList.remove('show-modal');
+            confirmModalContainer?.classList.remove('show-modal');
         }
     });
     

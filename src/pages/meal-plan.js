@@ -1,39 +1,67 @@
 import { updateCalendar, clearAllMeals, getMealPlan } from '../ui/meal-plan-ui.js';
 import { makeModalDraggable, setupModalListeners } from '../ui/modal.js';
 import { fetchShoppingList } from '../api.js';
+import { getJSON, safeSetLocalStorage } from '../storage.js';
+import { toastSuccessMessage } from '../ui/toast.js';
 
-document.addEventListener('DOMContentLoaded', () => {
-    const modal = document.getElementById('modal');
+let selectedRecipe = null;
+let calendarTargetDay = null;
+let calendarTargetMealNum = null;
+let pendingRecipe = null;
+let specificDay = null;
+let specific_meal_number = null;
+
+document.addEventListener('DOMContentLoaded', () => {      
+    const mainModal = document.querySelector('.modal-container');
     const confirmModal = document.getElementById('confirm-modal');
+    const modalForm = document.querySelector('.modal-form');
     const closeButtons = document.querySelectorAll('.close-button');
+    const mealPlan = getMealPlan();
 
-    // Initialize modals with all necessary event listeners
-    if (modal && confirmModal) {
-        makeModalDraggable(modal);
-        makeModalDraggable(confirmModal);
-        
-        // Setup modal listeners for close on click outside and escape key
-        setupModalListeners({ 
-            modal, 
-            confirmModal, 
-            closeButtons 
-        });
-    }
+    // Setup modal listeners
+    setupModalListeners({
+        modal: mainModal,
+        confirmModal: confirmModal,
+        closeButtons: closeButtons,
+        modalForm: modalForm,
+        onFormSubmit: (e) => {
+            e.preventDefault();
+            const day = modalForm.querySelector('[name=day]').value.toLowerCase();
+            const mealNum = Number(modalForm.querySelector('[name=meal-num]').value) - 1;
 
-    // Handle add meal button with event delegation
+            if (mealPlan[day] && mealPlan[day][mealNum]) {
+                // Show confirm modal if slot is occupied
+                confirmModal.classList.add('show-modal');
+                mainModal.classList.remove('show-modal');
+                pendingRecipe = selectedRecipe;
+                specificDay = day;
+                specific_meal_number = mealNum;
+            } else {
+                // Add meal directly if slot is empty
+                mealPlan[day][mealNum] = selectedRecipe;
+                safeSetLocalStorage('mealPlan', mealPlan);
+                mainModal.classList.remove('show-modal');
+                toastSuccessMessage();
+                updateCalendar();
+            }
+        }
+    });
+    
+    
+
+     // Remove duplicate modal query
     document.addEventListener('click', (e) => {
         if (e.target.closest('.add-meal-button')) {
             e.preventDefault();
             const day = e.target.closest('[data-day]')?.dataset.day;
             const mealNum = e.target.closest('[data-meal]')?.dataset.meal;
             
-            if (modal) {
-                // Store which cell was clicked
+            if (mainModal) { // Use mainModal instead of modal
                 if (day && mealNum) {
-                    modal.dataset.day = day;
-                    modal.dataset.meal = mealNum;
+                    mainModal.dataset.day = day;
+                    mainModal.dataset.meal = mealNum;
                 }
-                modal.classList.add('show-modal');
+                mainModal.classList.add('show-modal');
             }
         }
     });
@@ -54,13 +82,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (generateShoppingListButton) generateShoppingListButton.addEventListener('click', fetchShoppingList);
 
-    if (confirmYes) {
+   if (confirmYes) {
         confirmYes.addEventListener('click', () => {
             mealPlan[specificDay][specific_meal_number] = pendingRecipe;
             safeSetLocalStorage('mealPlan', mealPlan);
-            confirmModal.classList.remove('show-modal');
+            
+            // Close both modals using correct references
+            mainModal?.classList.remove('show-modal');
+            confirmModal?.classList.remove('show-modal');
+            
             toastSuccessMessage();
-            updateCalendar?.(); // Only call if function exists (on meal plan page)
+            updateCalendar?.();
+            
             // Reset temp vars
             specificDay = null;
             specific_meal_number = null;
@@ -79,43 +112,6 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 
-function updateMealPlan(e) {
-    e.preventDefault();
-    const day = (this.querySelector('[name=day]')).value.toLowerCase();
-    const validDays = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
-    if (!validDays.includes(day)) { // make sure user is entering a valid day
-        displayError('Not a valid day!');
-        return;
-    }
-    const meal_number = Number((this.querySelector('[name=meal-num]')).value) - 1;
-    console.log(meal_number);
-    if(meal_number < 0 || meal_number >= 5) { // make sure user is not going out of range
-        displayError('Please enter a number between 1 and 5');
-        return;
-    }
 
-    if (!selectedRecipe || !day || isNaN(meal_number)) {
-        toastErrorMessage();
-        return;
-    }
 
-    if (mealPlan[day][meal_number]) {
-        // ask user if they want to overwrite the existing meal
-        confirmModal.classList.add('show-modal');
-        modal.classList.remove('show-modal');
-        pendingRecipe = selectedRecipe; 
-        specificDay = day;
-        specific_meal_number = meal_number;
-        return;
-        // if yes, overwrite
-    } else {
-        mealPlan[day][meal_number] = selectedRecipe;
-        safeSetLocalStorage('mealPlan', mealPlan);
-        modal.classList.remove('show-modal');
-        toastSuccessMessage();
-        updateCalendar?.();
-    }
-}
-
-export { updateMealPlan };
 

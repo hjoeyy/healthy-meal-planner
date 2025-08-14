@@ -1,8 +1,12 @@
-
+import { getJSON, safeSetLocalStorage } from '../storage.js'
+import { toastSuccessMessage } from '../ui/toast.js';
+import { state } from '../state.js';
 
 const favoriteRecipeCards = document.querySelector('.favorite-recipe-cards');
+let favoritesList = getJSON('favoritesList', []);
 
 function attachFavoriteListeners() {
+    const mealPlan = state.mealPlan;
     const favoriteButtons = document.querySelectorAll('.favorite');
     favoriteButtons.forEach(button => {
         // Remove any previous click listeners by replacing the node
@@ -60,8 +64,11 @@ function attachFavoriteListeners() {
     });
 }
 
+
+
+
 function loadFavorites() {
-    favoritesList = JSON.parse(localStorage.getItem('favoritesList')) || [];
+    favoritesList = getJSON('favoritesList', []);
     console.log('Rendering favorites:', favoritesList);
     let favoritesHTML = '';
     favoritesList.forEach(favorite => {
