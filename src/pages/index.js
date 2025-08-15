@@ -208,7 +208,7 @@ function attachSearchListeners() {
 
 window.addEventListener('DOMContentLoaded', () => {
 
-// Setup modal listeners
+    // Setup modal listeners
     setupModalListeners({
         modal,
         confirmModal,
