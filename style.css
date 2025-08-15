@@ -181,10 +181,15 @@
     right: 0;
     bottom: 0;
     z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease;
 }
 
 .modal-container.show-modal {
     display: block;
+    opacity: 1;
+    visibility: visible;
 }
 
 .modal, .confirm-modal {
