@@ -118,26 +118,9 @@ function updateCalendar() {
  * @param {number} meal_num - The meal number (1-5)
  */
 function openCalendarModal(day, meal_num) {
-
-    const modalContainer = document.querySelector('.modal-container');
-    const modalSection = document.querySelector('.modal-container .modal');
-    
-    if (!modalContainer || !modalSection) {
-        console.error('Modal elements not found!');
-        return;
-    }
-
-    // Show both elements
-    modalContainer.classList.add('show-modal');
-    modalSection.style.display = 'block';
-
-       console.log('Modal before:', {
-        modal: modal,
-        classList: modal?.classList,
-        isShowing: modal?.classList.contains('show-modal')
-    });
-
     if (modalRecipeCards) {
+        // Always show the modal
+        modal.classList.add('show-modal');
         // Set up event delegation ONCE
         if (!modalRecipeCards._listenerSet) {
             modalRecipeCards.addEventListener('click', function(e) {
@@ -148,17 +131,7 @@ function openCalendarModal(day, meal_num) {
                     const wasEmpty = !mealPlan[calendarTargetDay][calendarTargetMealNum];
                     mealPlan[calendarTargetDay][calendarTargetMealNum] = recipeObj;
                     safeSetLocalStorage('mealPlan', mealPlan);
-
-                    // Hide both elements
-                    modalContainer.classList.remove('show-modal');
-                    modalSection.style.display = 'none';
-
-                    console.log('After closing modal:', {
-                        modal: modal,
-                        classList: modal?.classList,
-                        isShowing: modal?.classList.contains('show-modal')
-                    });
-
+                    modal.classList.remove('show-modal');
                     updateCalendar();
                     if (wasEmpty) {
                         toastSuccessMessage();
