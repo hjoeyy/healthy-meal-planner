@@ -23,37 +23,59 @@ export function makeModalDraggable(modal) {
     let offsetX = 0, offsetY = 0, startX = 0, startY = 0, isDragging = false;
 
     // When mouse is pressed down on the modal, start dragging
-    if(modal) {
-        modal.addEventListener('mousedown', function(e) {
-            isDragging = true;
+
+    function handleStart(e) {
+        isDragging = true;
+        if (e.type === 'mousedown') {
             startX = e.clientX; // Mouse X position when drag starts
             startY = e.clientY; // Mouse Y position when drag starts
-            // Get modal's current position
-            const rect = modal.getBoundingClientRect();
-            offsetX = startX - rect.left;
-            offsetY = startY - rect.top;
-            document.body.style.userSelect = 'none'; // Prevents text selection while dragging
-    });
+        } else if (e.type === 'touchstart') {
+            startX = e.touches[0].clientX;
+            startY = e.touches[0].clientY;
+        }
+        // Get modal's current position
+        const rect = modal.getBoundingClientRect();
+        offsetX = startX - rect.left;
+        offsetY = startY - rect.top;
+        document.body.style.userSelect = 'none';
     }
 
     // When mouse moves, if dragging, move the modal to follow the mouse
-    document.addEventListener('mousemove', function(e) {
+    function handleMove(e) {
         if (!isDragging) return; // Only move if dragging
+        e.preventDefault();
+        let clientX, clientY;
         // Calculate new position for the modal
-        let left = e.clientX - offsetX;
-        let top = e.clientY - offsetY;
+        if (e.type == 'mousemove') {
+            clientX = e.clientX;
+            clientY = e.clientY;
+        } else if (e.type == 'touchmove') {
+            clientX = e.touches[0].clientX;
+            clientY = e.touches[0].clientY;
+        }
+
+        let left = clientX - offsetX;
+        let top = clientY - offsetY;
         // Move modal to new position
         modal.style.left = left + 'px';
         modal.style.top = top + 'px';
         modal.style.transform = 'none'; // Disable centering while dragging
         modal.style.position = 'fixed'; // Keep modal on top
-    });
+    }
 
     // When mouse is released, stop dragging
-    document.addEventListener('mouseup', function() {
+    function handleEnd() {
         isDragging = false;
         document.body.style.userSelect = '';
-    });
+    }
+
+    modal.addEventListener('mousedown', handleStart);
+    document.addEventListener('mousemove', handleMove);
+    document.addEventListener('mouseup', handleEnd);
+
+    modal.addEventListener('touchstart', handleStart, { passive: false});
+    document.addEventListener('touchmove', handleMove, { passive: false });
+    document.addEventListener('touchend', handleEnd);
 }
 
 export function setupModalListeners({modal, confirmModal, closeButtons, modalForm, onFormSubmit}) {

@@ -4,6 +4,7 @@ const favoriteRecipeCards = document.querySelector('.favorite-recipe-cards');
 let selectedRecipe = null;
 
 if (window.location.pathname.endsWith('favorites.html')) {
+    attachFavoriteListeners();
     loadFavorites();
 }
 

@@ -6,7 +6,8 @@ const favoriteRecipeCards = document.querySelector('.favorite-recipe-cards');
 let favoritesList = getJSON('favoritesList', []);
 
 function attachFavoriteListeners() {
-    const mealPlan = state.mealPlan;
+    const mealPlan = getJSON('mealPlan', []);
+    console.log("Meal Plan: ", mealPlan);
     const favoriteButtons = document.querySelectorAll('.favorite');
     favoriteButtons.forEach(button => {
         // Remove any previous click listeners by replacing the node

@@ -1,4 +1,4 @@
-import { getJSON, safeSetLocalStorage } from '../storage.js';
+import { safeSetLocalStorage } from '../storage.js';
 import { clearShoppingListToastSuccessMessage } from './toast.js';
 
 let id = 1;
@@ -20,16 +20,6 @@ function renderShoppingList() {
     if (shoppingList) shoppingList.innerHTML = shoppingListHTML;
     let boxes = document.getElementsByClassName('box').length;
 
-    // function save() { // save checked boxes to localStorage
-    //     for(let i = 1; i <= boxes; i++) {
-    //         const checkbox = document.getElementById(String(i));
-    //         //localStorage.setItem("checkbox" + String(i), checkbox.checked);
-    //         if (checkbox) {
-    //             safeSetLocalStorage(`checkbox${i}`, checkbox.checked);
-    //         }
-    //     }
-    // }
-
     document.querySelector('.shopping-list-ul').addEventListener('change', (e) => {
         // Check if the changed element is a checkbox
         if (e.target.matches('input[type="checkbox"]')) {
@@ -48,7 +38,6 @@ function renderShoppingList() {
 
 
 function clearAllShoppingItems() {
-    //localStorage.setItem('shoppingList', ingredients = []);
     safeSetLocalStorage('shoppingList', []);
     const shoppingList = document.querySelector('.shopping-list-ul');
     if (shoppingList) shoppingList.innerHTML = '';
