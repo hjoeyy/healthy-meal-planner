@@ -344,6 +344,25 @@
     padding-bottom: 50px;
 }
 
+.meal-plan-calendar-mobile {
+    display: none;
+}
+
+@media (max-width: 480px) {
+    .meal-plan-calendar-header {
+        font-size: 24px;
+    }
+    
+    .meal-plan-calendar {
+        display: none;
+    }
+
+    .meal-plan-calendar-mobile {
+        display: block;
+    }
+}
+
+
 .calendar {
     border-spacing: 10px;
 }
