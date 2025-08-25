@@ -56,13 +56,14 @@ export function getMealPlan() {
 
 
 function updateCalendar() {
+    console.log('Starting updateCalendar');
     for (let day in mealPlan) {
         //console.log(mealPlan[day])
         mealPlan[day].forEach((recipe, meal_num) => {
             const cell = document.querySelector(`.meal[data-day="${day}"][data-meal="${meal_num + 1}"]`);
             if (cell) {
                 if (recipe) {
-
+                    cell.setAttribute('data-day', day.charAt(0).toUpperCase() + day.slice(1));
                     cell.innerHTML = 
                     `<button class="favorite" data-id="${recipe.id}">
                     <svg class="heart-svg${favoritesList.some(fav => fav.id === recipe.id) ? ' favorited' : ''}" width="30px" height="30px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -120,16 +121,29 @@ function updateCalendar() {
 function openCalendarModal(day, meal_num) {
 
     const modalContainer = document.querySelector('.modal-container');
-    const modalSection = document.querySelector('.modal-container .modal');
+    const modalBox = modalContainer?.querySelector('.modal');
     
-    if (!modalContainer || !modalSection) {
+    console.log('Opening modal:', {
+        isMobile: window.matchMedia('(max-width: 480px)').matches,
+        modalFound: {
+            container: !!modalContainer,
+            box: !!modalBox
+        },
+        modalState: {
+            containerClasses: modalContainer?.classList.toString(),
+            boxDisplay: modalBox?.style.display
+        }
+    });
+
+    
+    if (!modalContainer || !modalBox) {
         console.error('Modal elements not found!');
         return;
     }
 
     // Show both elements
     modalContainer.classList.add('show-modal');
-    modalSection.style.display = 'block';
+    modalBox.style.display = 'block';
 
        console.log('Modal before:', {
         modal: modal,
@@ -151,7 +165,7 @@ function openCalendarModal(day, meal_num) {
 
                     // Hide both elements
                     modalContainer.classList.remove('show-modal');
-                    modalSection.style.display = 'none';
+                    modalBox.style.display = 'none';
 
                     console.log('After closing modal:', {
                         modal: modal,

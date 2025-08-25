@@ -344,21 +344,132 @@
     padding-bottom: 50px;
 }
 
-.meal-plan-calendar-mobile {
-    display: none;
+.calendar-buttons {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    justify-content: flex-end;
+    width: 100%;
+    padding-right: 50px;
+    padding-top: 20px;
 }
+
 
 @media (max-width: 480px) {
     .meal-plan-calendar-header {
         font-size: 24px;
     }
-    
-    .meal-plan-calendar {
-        display: none;
+
+    .calendar {
+        display: block;
+        width: 100%;
+        border-spacing: 0;
     }
 
-    .meal-plan-calendar-mobile {
+    .calendar thead {
+        display: none; /* Hide table headers on mobile */
+    }
+
+    .calendar tbody, 
+    .calendar tr {
         display: block;
+        width: 100%;
+    }
+
+    .calendar td {
+        /* Stack cells vertically */
+        display: block;
+        width: 90%;
+        margin: 10px auto;
+        border: 1px solid lightgray;
+        border-radius: 8px;
+        position: relative;
+    }
+
+        /* Day label styles - simplified and consistent */
+    .meal[data-day]::before {
+        content: attr(data-day);
+        display: block;
+        width: 100%;
+        text-align: center;
+        font-weight: bold;
+        font-size: 16px;
+        padding: 8px 0;
+        border-radius: 8px 8px 0 0;
+        /* Remove position absolute/relative positioning */
+        text-transform: capitalize;
+    }
+
+    .meal {
+        padding: 10px;
+        min-height: 50px;
+        border-radius: 0 0 8px 8px;
+        /* Add word wrap for long content */
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+    }
+
+    /* Remove specific day styles that might cause inconsistency */
+    .meal[data-day="monday"]::before,
+    .meal[data-day="tuesday"]::before,
+    .meal[data-day="wednesday"]::before,
+    .meal[data-day="thursday"]::before,
+    .meal[data-day="friday"]::before,
+    .meal[data-day="saturday"]::before,
+    .meal[data-day="sunday"]::before {
+        position: static; /* Override any position settings */
+        top: auto;
+        margin: 0;
+    }
+
+        /* Adjust favorite button position */
+    .meal .favorite {
+        top: 15px;
+        right: 15px;
+    }
+
+    .favorite {
+        max-width: 50px;
+    }
+
+    /* Adjust add meal button style */
+    .meal button {
+        width: auto; /* Changed from 100% */
+        min-width: 80px;
+        padding: 8px 12px;
+        margin: 5px 0;
+        font-size: 14px; /* Reduced font size */
+        white-space: nowrap; /* Prevent button text from wrapping */
+    }
+
+     /* Center the bottom action buttons */
+    .calendar-buttons {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        width: 90%;
+        margin: 0 auto;
+        padding: 10px 0;
+        padding-right: 0;
+    }
+
+    .clear-all,
+    .generate-shopping-list {
+        width: auto;
+        min-width: 100px;
+        text-align: center;
+    }
+    /* CSS */
+    .calendar td::before {
+        content: attr(data-day); /* Gets the value from data-day attribute */
+        display: block;
+        font-weight: bold;
+        color: black;
+        /* ... other styling ... */
+    }
+
+    #modal-search {
+        width: 90%;
     }
 }
 
@@ -414,15 +525,7 @@
     background-color: white;
 }
 
-.calendar-buttons {
-    display: flex;
-    gap: 16px;
-    align-items: center;
-    justify-content: flex-end;
-    width: 100%;
-    padding-right: 50px;
-    padding-top: 20px;
-}
+
 
 .modal-recipe-cards {
     display: grid;
@@ -442,6 +545,65 @@
     border-radius: 20px;
     padding: 20px;
     position: relative;
+}
+
+@media (max-width: 480px) {
+    /* Update modal styles */
+    .modal {
+        background: #98ecb4;
+        border-radius: 5px;
+        position: fixed; /* Change from absolute to fixed */
+        cursor: default; /* Remove move cursor */
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        max-width: 100%;
+        width: 400px;
+        z-index: 1100;
+        max-height: 80vh; /* Limit modal height */
+        overflow: hidden; /* Hide overflow */
+    }
+
+    /* Update recipe cards container */
+    .modal-recipe-cards {
+        display: flex; /* Change from grid to flex */
+        flex-wrap: nowrap;
+        gap: 16px;
+        padding: 10px;
+        overflow-x: auto;
+        overflow-y: hidden;
+        width: 100%;
+        -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+        scroll-snap-type: x mandatory;
+    }
+
+    .modal-recipe-card {
+        flex: 0 0 auto;
+        width: 200px;
+        min-width: 200px;
+        scroll-snap-align: start;
+        background: white;
+        border: 1px solid lightgray;
+        border-radius: 20px;
+        padding: 20px;
+        position: relative;
+    }
+
+        /* Add scrollbar styling */
+    .modal-recipe-cards::-webkit-scrollbar {
+        height: 8px;
+    }
+
+    .modal-recipe-cards::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 4px;
+    }
+
+    .modal-recipe-cards::-webkit-scrollbar-thumb {
+        background: #65ab65;
+        border-radius: 4px;
+    }
+
 }
 
 .add-meal-button {

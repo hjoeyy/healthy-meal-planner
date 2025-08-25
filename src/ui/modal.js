@@ -78,7 +78,7 @@ export function makeModalDraggable(modal) {
     document.addEventListener('touchend', handleEnd);
 }
 
-export function setupModalListeners({modal, confirmModal, closeButtons, modalForm, onFormSubmit}) {
+export function setupModalListeners({closeButtons, modalForm, onFormSubmit}) {
     //if (!modal || !confirmModal) return; // check if null
 
     const mainModalContainer = document.querySelector('.modal-container');
@@ -105,7 +105,13 @@ export function setupModalListeners({modal, confirmModal, closeButtons, modalFor
     
     // Close on click outside
     window.addEventListener('click', (e) => {
-        console.log('Click target:', e.target.className);
+        console.log({
+            clickTarget: e.target,
+            targetClasses: e.target.classList,
+            targetParent: e.target.parentElement,
+            isDirectModalContainer: e.target.classList.contains('modal-container'),
+            path: e.composedPath()
+        });
         if (e.target === mainModalContainer) {
             mainModalContainer.classList.remove('show-modal');
         }
